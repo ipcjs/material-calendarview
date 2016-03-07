@@ -69,8 +69,9 @@ public class CalendarDragLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        measureChildren(widthMeasureSpec, heightMeasureSpec);
-        measureChild(mCalendarView, widthMeasureSpec, heightMeasureSpec);
+//        measureChildren(widthMeasureSpec, heightMeasureSpec);
+//        measureChild(mCalendarView, widthMeasureSpec, heightMeasureSpec);
+        measureCalendar();
         measureChild(mListView, widthMeasureSpec, MeasureSpec.makeMeasureSpec(
                         MeasureSpec.getSize(heightMeasureSpec) - mCalendarView.getMinimumHeight(), MeasureSpec.getMode(heightMeasureSpec))
         );
@@ -82,6 +83,12 @@ public class CalendarDragLayout extends ViewGroup {
         layout();
     }
 
+    private void measureCalendar() {
+        measureChild(mCalendarView,
+                MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY)
+        );
+    }
     private void layout() {
 //        layoutChild(mCaptureView, mTop); // 歪打正着, mCaptureView不须要layout...
         layoutChildWithScale(mCalendarView, mTop, mScalePercent);

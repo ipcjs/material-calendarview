@@ -110,6 +110,10 @@ public class MaterialCalendarView extends ViewGroup {
     public @interface ShowOtherDates {
     }
 
+    public boolean isVerticalSplit() {
+        // TODO: 2016/3/8
+        return true;
+    }
     /**
      * Do not show any non-enabled dates
      */
@@ -133,7 +137,6 @@ public class MaterialCalendarView extends ViewGroup {
      */
     public static final int SHOW_DECORATED_DISABLED = 1 << 2;
 
-    public static final int SHOW_VERTICAL_CENTER = 1 << 3;
     /**
      * The default flags for showing non-enabled dates. Currently only shows {@link #SHOW_DECORATED_DISABLED}
      */
@@ -1317,7 +1320,7 @@ public class MaterialCalendarView extends ViewGroup {
             //We have a tileSize set, we should use that
             measureTileSize = this.tileSize;
         } else if (specWidthMode == MeasureSpec.EXACTLY) {
-            if (specHeightMode == MeasureSpec.EXACTLY) {
+            if (specHeightMode == MeasureSpec.EXACTLY && !isVerticalSplit()) {
                 //Pick the larger of the two explicit sizes
                 measureTileSize = Math.max(desiredTileWidth, desiredTileHeight);
             } else {
@@ -1361,8 +1364,12 @@ public class MaterialCalendarView extends ViewGroup {
                     MeasureSpec.EXACTLY
             );
 
+            int heightSize = p.tileHeight * measureTileSize;
+            if (isVerticalSplit() && child == pager) {
+                heightSize = getMeasuredHeight() - (getTopbarVisible() ? topbar.getMeasuredHeight() : 0);
+            }
             int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                    p.tileHeight * measureTileSize,
+                    heightSize,
                     MeasureSpec.EXACTLY
             );
 
@@ -1375,10 +1382,7 @@ public class MaterialCalendarView extends ViewGroup {
         boolean isInMonthsMode = calendarMode.equals(CalendarMode.MONTHS);
         if (isInMonthsMode && mDynamicHeightEnabled && adapter != null && pager != null) {
             Calendar cal = (Calendar) adapter.getItem(pager.getCurrentItem()).getCalendar().clone();
-            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-            //noinspection ResourceType
-            cal.setFirstDayOfWeek(getFirstDayOfWeek());
-            weekCount = cal.get(Calendar.WEEK_OF_MONTH);
+            weekCount = CalendarUtils.getWeekCountOfMonth(cal, getFirstDayOfWeek());
         }
         return weekCount;
     }

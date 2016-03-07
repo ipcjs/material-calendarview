@@ -26,6 +26,7 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     protected static final int DEFAULT_DAYS_IN_WEEK = 7;
     private static final Calendar tempWorkingCalendar = CalendarUtils.getInstance();
     private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
+    private final List<DayView> dayViews = new ArrayList<>();
     private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<>();
     @ShowOtherDates
     protected int showOtherDates = SHOW_DEFAULTS;
@@ -35,7 +36,17 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     private CalendarDay maxDate = null;
     private int firstDayOfWeek;
 
-    private final Collection<DayView> dayViews = new ArrayList<>();
+    public boolean isVerticalSplit() {
+        // TODO: 2016/3/8
+        return true;
+    }
+
+    public boolean isShowWeekDayView() {
+        // TODO: 2016/3/8  
+        return true;
+    }
+
+    protected abstract int getActualWeekCount();
 
     public CalendarPagerView(@NonNull MaterialCalendarView view,
                              CalendarDay firstViewDay,
@@ -110,7 +121,15 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         updateUi();
     }
 
-    protected abstract void buildDayViews(Collection<DayView> dayViews, Calendar calendar);
+    protected abstract int getAddWeekCount();
+
+    protected void buildDayViews(Collection<DayView> dayViews, Calendar calendar) {
+        for (int r = 0; r < getAddWeekCount(); r++) {
+            for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
+                addDayView(dayViews, calendar);
+            }
+        }
+    }
 
     protected abstract boolean isDayEnabled(CalendarDay day);
 
@@ -226,6 +245,7 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         return new LayoutParams();
     }
 
+    private int measureTileSize;
     /**
      * {@inheritDoc}
      */
@@ -242,8 +262,8 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         }
 
         //The spec width should be a correct multiple
-        final int measureTileSize = specWidthSize / DEFAULT_DAYS_IN_WEEK;
-
+        measureTileSize = specWidthSize / DEFAULT_DAYS_IN_WEEK;
+        
         //Just use the spec sizes
         setMeasuredDimension(specWidthSize, specHeightSize);
 
@@ -270,30 +290,38 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
      */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        final int count = getChildCount();
-
         final int parentLeft = 0;
 
         int childTop = 0;
-        int childLeft = parentLeft;
+        int space = 0;
+        if (isVerticalSplit()) {
+            int tileCount = getActualWeekCount() + (isShowWeekDayView() ? 1 : 0);
+            space = (getHeight() - measureTileSize * tileCount) / tileCount;
+        }
+        if (isShowWeekDayView()) {
+            childTop = layout(weekDayViews, parentLeft, parentLeft, childTop, space);
+        }
+        childTop = layout(dayViews, parentLeft, parentLeft, childTop, space);
+    }
 
-        for (int i = 0; i < count; i++) {
-            final View child = getChildAt(i);
+    private int layout(List<? extends View> views, int parentLeft, int childLeft, int top, int space) {
+        for (int i = 0; i < views.size(); i++) {
+            final View child = views.get(i);
 
             final int width = child.getMeasuredWidth();
             final int height = child.getMeasuredHeight();
 
-            child.layout(childLeft, childTop, childLeft + width, childTop + height);
+            child.layout(childLeft, top, childLeft + width, top + height);
 
             childLeft += width;
 
             //We should warp every so many children
             if (i % DEFAULT_DAYS_IN_WEEK == (DEFAULT_DAYS_IN_WEEK - 1)) {
                 childLeft = parentLeft;
-                childTop += height;
+                top += height + space;
             }
-
         }
+        return top;
     }
 
     /**

@@ -65,6 +65,13 @@ public class CalendarUtils {
         to.set(year, month, day);
     }
 
+    public static int getWeekCountOfMonth(Calendar cal, int firstDayOfWeek) {
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        //noinspection ResourceType
+        cal.setFirstDayOfWeek(firstDayOfWeek);
+        return cal.get(Calendar.WEEK_OF_MONTH);
+    }
+
     public static int getYear(Calendar calendar) {
         return calendar.get(YEAR);
     }

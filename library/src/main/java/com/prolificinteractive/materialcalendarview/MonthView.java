@@ -3,9 +3,6 @@ package com.prolificinteractive.materialcalendarview;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
-import java.util.Calendar;
-import java.util.Collection;
-
 /**
  * Display a month of {@linkplain DayView}s and
  * seven {@linkplain WeekDayView}s.
@@ -16,17 +13,18 @@ class MonthView extends CalendarPagerView {
     private static final int DEFAULT_DAYS_IN_WEEK = 7;
     private static final int DEFAULT_MAX_WEEKS = 6;
 
-    public MonthView(@NonNull MaterialCalendarView view, CalendarDay month, int firstDayOfWeek) {
-        super(view, month, firstDayOfWeek);
+    @Override
+    protected int getActualWeekCount() {
+        return CalendarUtils.getWeekCountOfMonth(getFirstViewDay().getCalendar(), getFirstDayOfWeek());
     }
 
     @Override
-    protected void buildDayViews(Collection<DayView> dayViews, Calendar calendar) {
-        for (int r = 0; r < DEFAULT_MAX_WEEKS; r++) {
-            for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
-                addDayView(dayViews, calendar);
-            }
-        }
+    protected int getAddWeekCount() {
+        return DEFAULT_MAX_WEEKS;
+    }
+
+    public MonthView(@NonNull MaterialCalendarView view, CalendarDay month, int firstDayOfWeek) {
+        super(view, month, firstDayOfWeek);
     }
 
     public CalendarDay getMonth() {

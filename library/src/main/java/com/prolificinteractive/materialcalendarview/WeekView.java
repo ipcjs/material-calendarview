@@ -3,9 +3,6 @@ package com.prolificinteractive.materialcalendarview;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
-import java.util.Calendar;
-import java.util.Collection;
-
 /**
  * Display a week of {@linkplain DayView}s and
  * seven {@linkplain WeekDayView}s.
@@ -22,10 +19,13 @@ public class WeekView extends CalendarPagerView {
     }
 
     @Override
-    protected void buildDayViews(Collection<DayView> dayViews, Calendar calendar) {
-        for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
-            addDayView(dayViews, calendar);
-        }
+    protected int getActualWeekCount() {
+        return 1;
+    }
+
+    @Override
+    protected int getAddWeekCount() {
+        return 1;
     }
 
     @Override
