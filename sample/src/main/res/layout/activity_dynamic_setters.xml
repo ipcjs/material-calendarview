@@ -17,7 +17,7 @@
         >
 
         <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-            android:background="?colorPrimary"
+            android:background="#1111"
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -174,12 +174,13 @@
             android:orientation="horizontal"
             >
 
-            <Button
-                android:id="@+id/_null"
+
+            <CheckBox
+                android:id="@+id/check_week_mode_enabled"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="no something"
+                android:text="Week Mode Enabled"
                 />
 
             <CheckBox

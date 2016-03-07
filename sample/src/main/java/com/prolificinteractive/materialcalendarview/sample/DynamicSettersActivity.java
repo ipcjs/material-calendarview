@@ -12,6 +12,7 @@ import android.widget.DatePicker;
 import android.widget.NumberPicker;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.util.Calendar;
@@ -93,6 +94,11 @@ public class DynamicSettersActivity extends AppCompatActivity {
     @OnCheckedChanged(R.id.check_dynamic_height_enabled)
     void xx(boolean checked) {
         widget.setDynamicHeightEnabled(checked);
+    }
+
+    @OnCheckedChanged(R.id.check_week_mode_enabled)
+    void yy(boolean checked) {
+        widget.setCalendarDisplayMode(checked ? CalendarMode.WEEKS : CalendarMode.MONTHS);
     }
 
     @OnCheckedChanged(R.id.check_page_enabled) 
