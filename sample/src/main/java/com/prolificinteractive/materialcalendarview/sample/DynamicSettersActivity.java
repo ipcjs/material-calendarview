@@ -90,6 +90,11 @@ public class DynamicSettersActivity extends AppCompatActivity {
         widget.setShowOtherDates(checked ? MaterialCalendarView.SHOW_ALL : MaterialCalendarView.SHOW_NONE);
     }
 
+    @OnCheckedChanged(R.id.check_dynamic_height_enabled)
+    void xx(boolean checked) {
+        widget.setDynamicHeightEnabled(checked);
+    }
+
     @OnCheckedChanged(R.id.check_page_enabled) 
     void onPageEnabledChecked(boolean checked) {
         widget.setPagingEnabled(checked);

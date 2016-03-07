@@ -1098,6 +1098,7 @@ public class MaterialCalendarView extends ViewGroup {
      */
     public void setDynamicHeightEnabled(boolean useDynamicHeight) {
         this.mDynamicHeightEnabled = useDynamicHeight;
+        requestLayout();
     }
 
     /**
@@ -1303,9 +1304,7 @@ public class MaterialCalendarView extends ViewGroup {
         final int desiredWidth = specWidthSize - getPaddingLeft() - getPaddingRight();
         final int desiredHeight = specHeightSize - getPaddingTop() - getPaddingBottom();
 
-        final int weekCount = getWeekCountBasedOnMode();
-
-        final int viewTileHeight = getTopbarVisible() ? (weekCount + 1) : weekCount;
+        final int viewTileHeight = getWeekCountBasedOnMode() + DAY_NAMES_ROW + (getTopbarVisible() ? 1 : 0);
 
         //Calculate independent tile sizes for later
         int desiredTileWidth = desiredWidth / DEFAULT_DAYS_IN_WEEK;
@@ -1380,7 +1379,7 @@ public class MaterialCalendarView extends ViewGroup {
             cal.setFirstDayOfWeek(getFirstDayOfWeek());
             weekCount = cal.get(Calendar.WEEK_OF_MONTH);
         }
-        return weekCount + DAY_NAMES_ROW;
+        return weekCount;
     }
 
     /**

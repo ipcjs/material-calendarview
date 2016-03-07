@@ -17,6 +17,7 @@
         >
 
         <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            android:background="?colorPrimary"
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -163,6 +164,30 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:checked="true"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/_null"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="no something"
+                />
+
+            <CheckBox
+                android:id="@+id/check_dynamic_height_enabled"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Dynamic Height Enabled"
                 />
 
         </LinearLayout>
