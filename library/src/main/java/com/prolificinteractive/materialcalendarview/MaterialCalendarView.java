@@ -356,16 +356,16 @@ public class MaterialCalendarView extends ViewGroup {
 
         buttonPast.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         buttonPast.setImageResource(R.drawable.mcv_action_previous);
-        topbar.addView(buttonPast, new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1));
+        topbar.addView(buttonPast, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
 
         title.setGravity(Gravity.CENTER);
         topbar.addView(title, new LinearLayout.LayoutParams(
-                0, LayoutParams.MATCH_PARENT, DEFAULT_DAYS_IN_WEEK - 2
+                0, LinearLayout.LayoutParams.MATCH_PARENT, DEFAULT_DAYS_IN_WEEK - 2
         ));
 
         buttonFuture.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         buttonFuture.setImageResource(R.drawable.mcv_action_next);
-        topbar.addView(buttonFuture, new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1));
+        topbar.addView(buttonFuture, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
 
         pager.setId(R.id.mcv_pager);
         pager.setOffscreenPageLimit(1);
@@ -512,7 +512,7 @@ public class MaterialCalendarView extends ViewGroup {
 
     /**
      * Pass all touch events to the pager so scrolling works on the edges of the calendar view.
-     * 
+     *
      * @param event
      * @return
      */
@@ -1362,7 +1362,7 @@ public class MaterialCalendarView extends ViewGroup {
             );
 
             int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                    p.height * measureTileSize,
+                    p.tileHeight * measureTileSize,
                     MeasureSpec.EXACTLY
             );
 
@@ -1486,10 +1486,11 @@ public class MaterialCalendarView extends ViewGroup {
          *
          * @param tileHeight view height in number of tiles
          */
+        public int tileHeight;
         public LayoutParams(int tileHeight) {
-            super(MATCH_PARENT, tileHeight);
+            super(MATCH_PARENT, WRAP_CONTENT);
+            this.tileHeight = tileHeight;
         }
-
     }
 
     /**
