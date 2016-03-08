@@ -1,15 +1,24 @@
 package com.prolificinteractive.materialcalendarview.sample.drag;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
+import android.text.style.LineBackgroundSpan;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.sample.R;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Created by JiangSong on 2016/3/7.
@@ -106,7 +115,7 @@ public class CalendarDragLayout extends ViewGroup {
     }
 
     private int mTop = 0;
-    private float mScalePercent = 0;
+    public static float mScalePercent = 0;
 
     private void layoutChildWithScale(View child, int top, float scalePercent) {
         int height = child.getMeasuredHeight();
@@ -172,4 +181,103 @@ public class CalendarDragLayout extends ViewGroup {
             return getMeasuredHeight();
         }
     };
+
+    /**
+     * Span to draw a dot centered under a section of text
+     */
+    public static class DotSpan implements LineBackgroundSpan {
+
+        /**
+         * Default radius used
+         */
+        public static final float DEFAULT_RADIUS = 3;
+
+        private final float radius;
+        private final int color;
+
+        /**
+         * Create a span to draw a dot using default radius and color
+         *
+         * @see #DotSpan(float, int)
+         * @see #DEFAULT_RADIUS
+         */
+        public DotSpan() {
+            this.radius = DEFAULT_RADIUS;
+            this.color = 0;
+        }
+
+        /**
+         * Create a span to draw a dot using a specified color
+         *
+         * @param color color of the dot
+         * @see #DotSpan(float, int)
+         * @see #DEFAULT_RADIUS
+         */
+        public DotSpan(int color) {
+            this.radius = DEFAULT_RADIUS;
+            this.color = color;
+        }
+
+        /**
+         * Create a span to draw a dot using a specified radius
+         *
+         * @param radius radius for the dot
+         * @see #DotSpan(float, int)
+         */
+        public DotSpan(float radius) {
+            this.radius = radius;
+            this.color = 0;
+        }
+
+        /**
+         * Create a span to draw a dot using a specified radius and color
+         *
+         * @param radius radius for the dot
+         * @param color  color of the dot
+         */
+        public DotSpan(float radius, int color) {
+            this.radius = radius;
+            this.color = color;
+        }
+
+        @Override
+        public void drawBackground(
+                Canvas canvas, Paint paint,
+                int left, int right, int top, int baseline, int bottom,
+                CharSequence charSequence,
+                int start, int end, int lineNum
+        ) {
+            int oldColor = paint.getColor();
+            if (color != 0) {
+                int alpha = (int) (mScalePercent * 255);
+                paint.setColor((color & 0xff_ff_ff) | (alpha << 24));
+            }
+            canvas.drawCircle((left + right) / 2, bottom + radius, radius, paint);
+            paint.setColor(oldColor);
+        }
+    }
+
+    /**
+     * Decorate several days with a dot
+     */
+    public static class EventDecorator implements DayViewDecorator {
+
+        private int color;
+        private HashSet<CalendarDay> dates;
+
+        public EventDecorator(int color, Collection<CalendarDay> dates) {
+            this.color = color;
+            this.dates = new HashSet<>(dates);
+        }
+
+        @Override
+        public boolean shouldDecorate(CalendarDay day) {
+            return dates.contains(day);
+        }
+
+        @Override
+        public void decorate(DayViewFacade view) {
+            view.addSpan(new DotSpan(5, color));
+        }
+    }
 }

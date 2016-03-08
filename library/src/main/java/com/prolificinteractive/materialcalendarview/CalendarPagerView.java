@@ -295,8 +295,8 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         int childTop = 0;
         int space = 0;
         if (isVerticalSplit()) {
-            int tileCount = getActualWeekCount() + (isShowWeekDayView() ? 1 : 0);
-            space = (getHeight() - measureTileSize * tileCount) / tileCount;
+            int tileRowCount = getActualWeekCount() + (isShowWeekDayView() ? 1 : 0);
+            space = (getHeight() - measureTileSize * tileRowCount) / tileRowCount;
         }
         if (isShowWeekDayView()) {
             childTop = layout(weekDayViews, parentLeft, parentLeft, childTop, space);
