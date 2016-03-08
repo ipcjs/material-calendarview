@@ -266,22 +266,23 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         
         //Just use the spec sizes
         setMeasuredDimension(specWidthSize, specHeightSize);
+        int space = /*getMeasureRemainingSpaceForRow()*/0;
+        measure(weekDayViews, space);
+        measure(dayViews, space);
+    }
 
-        int count = getChildCount();
-        for (int i = 0; i < count; i++) {
-            final View child = getChildAt(i);
-
+    private void measure(List<? extends View> views, int space) {
+        for (View view : views) {
             int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
                     measureTileSize,
                     MeasureSpec.EXACTLY
             );
 
             int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                    measureTileSize,
+                    measureTileSize + space,
                     MeasureSpec.EXACTLY
             );
-
-            child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+            view.measure(childWidthMeasureSpec, childHeightMeasureSpec);
         }
     }
 
@@ -293,15 +294,20 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         final int parentLeft = 0;
 
         int childTop = 0;
-        int space = 0;
-        if (isVerticalSplit()) {
-            int tileRowCount = getActualWeekCount() + (isShowWeekDayView() ? 1 : 0);
-            space = (getHeight() - measureTileSize * tileRowCount) / tileRowCount;
-        }
+        int space = getMeasureRemainingSpaceForRow();
         if (isShowWeekDayView()) {
             childTop = layout(weekDayViews, parentLeft, parentLeft, childTop, space);
         }
         childTop = layout(dayViews, parentLeft, parentLeft, childTop, space);
+    }
+
+    private int getMeasureRemainingSpaceForRow() {
+        int space = 0;
+        if (isVerticalSplit()) {
+            int tileRowCount = getActualWeekCount() + (isShowWeekDayView() ? 1 : 0);
+            space = (getMeasuredHeight() - measureTileSize * tileRowCount) / tileRowCount;
+        }
+        return space;
     }
 
     private int layout(List<? extends View> views, int parentLeft, int childLeft, int top, int space) {
