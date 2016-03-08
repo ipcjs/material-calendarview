@@ -1308,13 +1308,13 @@ public class MaterialCalendarView extends ViewGroup {
         final int desiredWidth = specWidthSize - getPaddingLeft() - getPaddingRight();
         final int desiredHeight = specHeightSize - getPaddingTop() - getPaddingBottom();
 
-        final int viewTileHeight = getWeekCountBasedOnMode() + DAY_NAMES_ROW + (getTopbarVisible() ? 1 : 0);
+        final int tileRowCount = getTileRowCount();
 
         //Calculate independent tile sizes for later
         int desiredTileWidth = desiredWidth / DEFAULT_DAYS_IN_WEEK;
-        int desiredTileHeight = desiredHeight / viewTileHeight;
+        int desiredTileHeight = desiredHeight / tileRowCount;
 
-        int measureTileSize = -1;
+        measureTileSize = -1;
 
         if (this.tileSize > 0) {
             //We have a tileSize set, we should use that
@@ -1339,7 +1339,7 @@ public class MaterialCalendarView extends ViewGroup {
 
         //Calculate our size based off our measured tile size
         int measuredWidth = measureTileSize * DEFAULT_DAYS_IN_WEEK;
-        int measuredHeight = measureTileSize * viewTileHeight;
+        int measuredHeight = measureTileSize * tileRowCount;
 
         //Put padding back in from when we took it away
         measuredWidth += getPaddingLeft() + getPaddingRight();
@@ -1366,6 +1366,7 @@ public class MaterialCalendarView extends ViewGroup {
 
             int heightSize = p.tileHeight * measureTileSize;
             if (isVerticalSplit() && child == pager) {
+                // pager占用除topbar外的所有空间
                 heightSize = getMeasuredHeight() - (getTopbarVisible() ? topbar.getMeasuredHeight() : 0);
             }
             int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
@@ -1375,6 +1376,40 @@ public class MaterialCalendarView extends ViewGroup {
 
             child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
         }
+    }
+
+    public boolean isShowWeekDayView() {
+        // TODO: 2016/3/8
+        return true;
+    }
+
+    private int measureTileSize;
+
+    public int getMeasureTileSize() {
+        return measureTileSize;
+    }
+
+    public int getMeasureNormalHeight() {
+        return measureTileSize * getTileRowCount();
+    }
+
+    public int getMeasureMinHeight() {
+        return measureTileSize * (1 + getOtherRowCount());
+    }
+
+    private int getTileRowCount() {
+        return getWeekCountBasedOnMode() + getOtherRowCount();
+    }
+
+    private int getOtherRowCount() {
+        int count = 0;
+        if (isShowWeekDayView()) {
+            count++;
+        }
+        if (getTopbarVisible()) {
+            count++;
+        }
+        return count;
     }
 
     private int getWeekCountBasedOnMode() {

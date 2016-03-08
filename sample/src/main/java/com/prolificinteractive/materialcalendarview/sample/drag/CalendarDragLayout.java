@@ -8,9 +8,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.sample.R;
-
-import static com.github.ipcjs.explorer.ExUtils.p;
 
 /**
  * Created by JiangSong on 2016/3/7.
@@ -19,7 +18,7 @@ public class CalendarDragLayout extends ViewGroup {
 
     private ViewDragHelper mDragHelper;
     private View mListView;
-    private View mCalendarView;
+    private MaterialCalendarView mCalendarView;
     private View mCaptureView;
 
     public CalendarDragLayout(Context context) {
@@ -62,7 +61,7 @@ public class CalendarDragLayout extends ViewGroup {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mCalendarView = findViewById(R.id.view_calendar);
+        mCalendarView = (MaterialCalendarView) findViewById(R.id.view_calendar);
         mListView = findViewById(R.id.view_list);
         mCaptureView = findViewById(R.id.view_capture);
     }
@@ -71,11 +70,12 @@ public class CalendarDragLayout extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //        measureChildren(widthMeasureSpec, heightMeasureSpec);
 //        measureChild(mCalendarView, widthMeasureSpec, heightMeasureSpec);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         measureCalendar();
         measureChild(mListView, widthMeasureSpec, MeasureSpec.makeMeasureSpec(
-                        MeasureSpec.getSize(heightMeasureSpec) - mCalendarView.getMinimumHeight(), MeasureSpec.getMode(heightMeasureSpec))
+                        MeasureSpec.getSize(heightMeasureSpec) - mCalendarView.getMeasureMinHeight(),
+                        MeasureSpec.getMode(heightMeasureSpec))
         );
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override
@@ -84,15 +84,25 @@ public class CalendarDragLayout extends ViewGroup {
     }
 
     private void measureCalendar() {
-        measureChild(mCalendarView,
-                MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY)
-        );
+        if (mScalePercent == 0f) {// mScalePercent时, 使用AT_MOST测量, 显示Calendar本来的大小
+            mCalendarView.measure(
+                    MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.AT_MOST)
+            );
+        } else {// 否则, 使用EXACTLY测量, Calendar设置成指定大小
+            int scaleHeight = (int) ((getMeasuredHeight() - mCalendarView.getMeasureNormalHeight()) * mScalePercent + 0.5f);
+            mCalendarView.measure(
+                    MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(mCalendarView.getMeasureNormalHeight() + scaleHeight, MeasureSpec.EXACTLY)
+            );
+        }
     }
     private void layout() {
-//        layoutChild(mCaptureView, mTop); // 歪打正着, mCaptureView不须要layout...
-        layoutChildWithScale(mCalendarView, mTop, mScalePercent);
-        layoutChild(mListView, mTop + mCalendarView.getHeight());
+//        layoutChildVercital(mCaptureView, mTop); // 歪打正着, mCaptureView不须要layout...
+        measureCalendar();
+        int top = mTop;
+        top = layoutChildVercital(mCalendarView, top);
+        top = layoutChildVercital(mListView, top);
     }
 
     private int mTop = 0;
@@ -108,17 +118,18 @@ public class CalendarDragLayout extends ViewGroup {
         child.layout(paddingLeft, top, paddingLeft + width, top + height + scaleHeight);
     }
 
-    private void layoutChild(View child, int top) {
+    private int layoutChildVercital(View child, int top) {
         int height = child.getMeasuredHeight();
         int width = child.getMeasuredWidth();
         int paddingLeft = getPaddingLeft();
         child.layout(paddingLeft, top, paddingLeft + width, top + height);
+        return top + height;
     }
 
     private ViewDragHelper.Callback mCallback = new ViewDragHelper.Callback() {
         @Override
         public boolean tryCaptureView(View child, int pointerId) {
-            p("tryCaptureView", mTop, child);
+            // 统统capture mCaptureView..
             mDragHelper.captureChildView(mCaptureView, pointerId);
             return false;
         }
@@ -127,15 +138,14 @@ public class CalendarDragLayout extends ViewGroup {
         public int clampViewPositionVertical(View child, int top, int dy) {
             int delta = child == mListView ? mCalendarView.getHeight() : 0;
             int temp = top - delta;
-            int min = -(mCalendarView.getMeasuredHeight() - mCalendarView.getMinimumHeight());
-            int max = child == mCaptureView ? getHeight() - mCalendarView.getMeasuredHeight() : 0;
+            int min = -(mCalendarView.getMeasureNormalHeight() - mCalendarView.getMeasureMinHeight());
+            int max = child == mCaptureView ? getHeight() - mCalendarView.getMeasureNormalHeight() : 0;
             temp = Math.min(Math.max(min, temp), max);
             return temp + delta;
         }
 
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
-//            p(changedView, top, dy);
             if (changedView == mCalendarView) {
                 mTop = top;
             } else if (changedView == mListView) {
@@ -143,7 +153,7 @@ public class CalendarDragLayout extends ViewGroup {
             } else if (changedView == mCaptureView) {
                 mTop = top;
                 if (mTop > 0) {
-                    mScalePercent = 1.0f * mTop / (getHeight() - mCalendarView.getMeasuredHeight());
+                    mScalePercent = 1.0f * mTop / (getHeight() - mCalendarView.getMeasureNormalHeight());
                     mTop = 0;
                 } else {
                     mScalePercent = 0;
