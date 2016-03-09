@@ -21,10 +21,9 @@ import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.DAY_OF_WEEK;
 
-abstract class CalendarPagerView extends ViewGroup implements View.OnClickListener {
+public abstract class CalendarPagerView extends ViewGroup implements View.OnClickListener {
 
     protected static final int DEFAULT_DAYS_IN_WEEK = 7;
-    private static final Calendar tempWorkingCalendar = CalendarUtils.getInstance();
     private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
     private final List<DayView> dayViews = new ArrayList<>();
     private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<>();
@@ -35,18 +34,8 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     private CalendarDay minDate = null;
     private CalendarDay maxDate = null;
     private int firstDayOfWeek;
+    private int measureTileSize;
 
-    public boolean isVerticalSplit() {
-        // TODO: 2016/3/8
-        return true;
-    }
-
-    public boolean isShowWeekDayView() {
-        // TODO: 2016/3/8  
-        return true;
-    }
-
-    protected abstract int getActualWeekCount();
 
     public CalendarPagerView(@NonNull MaterialCalendarView view,
                              CalendarDay firstViewDay,
@@ -59,9 +48,13 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         setClipChildren(false);
         setClipToPadding(false);
 
-        buildWeekDays(resetAndGetWorkingCalendar());
-        buildDayViews(dayViews, resetAndGetWorkingCalendar());
+        buildWeekDays(getFirstDayOfGrid());
+        buildDayViews(getFirstDayOfGrid());
     }
+
+    protected abstract int getAddedWeekCount();
+
+    protected abstract int getActualWeekCount();
 
     private void buildWeekDays(Calendar calendar) {
         for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
@@ -72,17 +65,27 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         }
     }
 
-    protected void addDayView(Collection<DayView> dayViews, Calendar calendar) {
-        CalendarDay day = CalendarDay.from(calendar);
-        DayView dayView = new DayView(getContext(), day);
-        dayView.setOnClickListener(this);
-        dayViews.add(dayView);
-        addView(dayView, new LayoutParams());
+    protected void buildDayViews(Calendar calendar) {
+        for (int r = 0; r < getAddedWeekCount(); r++) {
+            for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
+                CalendarDay day = CalendarDay.from(calendar);
+                DayView dayView = new DayView(getContext(), day, mcv);
+                dayView.setOnClickListener(this);
+                dayViews.add(dayView);
+                addView(dayView);
 
-        calendar.add(DATE, 1);
+                calendar.add(DATE, 1);
+            }
+        }
     }
 
-    protected Calendar resetAndGetWorkingCalendar() {
+    /**
+     * 获取当前图表网格的第一格DayView的日期
+     * @return
+     */
+    protected Calendar getFirstDayOfGrid() {
+        Calendar tempWorkingCalendar = CalendarUtils.getInstance();
+
         getFirstViewDay().copyTo(tempWorkingCalendar);
         //noinspection ResourceType
         tempWorkingCalendar.setFirstDayOfWeek(getFirstDayOfWeek());
@@ -104,14 +107,14 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     public void setFirstDayOfWeek(int dayOfWeek) {
         this.firstDayOfWeek = dayOfWeek;
 
-        Calendar calendar = resetAndGetWorkingCalendar();
+        Calendar calendar = getFirstDayOfGrid();
         calendar.set(DAY_OF_WEEK, dayOfWeek);
         for (WeekDayView dayView : weekDayViews) {
             dayView.setDayOfWeek(calendar);
             calendar.add(DATE, 1);
         }
 
-        calendar = resetAndGetWorkingCalendar();
+        calendar = getFirstDayOfGrid();
         for (DayView dayView : dayViews) {
             CalendarDay day = CalendarDay.from(calendar);
             dayView.setDay(day);
@@ -119,16 +122,6 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         }
 
         updateUi();
-    }
-
-    protected abstract int getAddWeekCount();
-
-    protected void buildDayViews(Collection<DayView> dayViews, Calendar calendar) {
-        for (int r = 0; r < getAddWeekCount(); r++) {
-            for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
-                addDayView(dayViews, calendar);
-            }
-        }
     }
 
     protected abstract boolean isDayEnabled(CalendarDay day);
@@ -245,7 +238,6 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         return new LayoutParams();
     }
 
-    private int measureTileSize;
     /**
      * {@inheritDoc}
      */
@@ -266,20 +258,46 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         
         //Just use the spec sizes
         setMeasuredDimension(specWidthSize, specHeightSize);
-        int space = /*getMeasureRemainingSpaceForRow()*/0;
-        measure(weekDayViews, space);
-        measure(dayViews, space);
+
+        int spaceOfRow = 0;
+        float scalePercent = 0;
+        if (mcv.isVerticalSplit()) {
+            int actualTileRowCount = getActualWeekCount() + (mcv.isShowWeekDayView() ? 1 : 0);
+            int actualHeight = getMeasuredHeight();
+            spaceOfRow = (actualHeight - measureTileSize * actualTileRowCount) / actualTileRowCount;
+            scalePercent = mcv.getScalePercent();
+        }
+
+        if (mcv.isShowWeekDayView()) {
+            measure(false, weekDayViews, spaceOfRow, scalePercent);
+        }
+        measure(true, dayViews, spaceOfRow, scalePercent);
     }
 
-    private void measure(List<? extends View> views, int space) {
+    private void measure(boolean isDayView, List<? extends View> views, int space, float scalePercent) {
         for (View view : views) {
+            if (isDayView) {
+                boolean shouldReDraw = false;
+                for (DayView.OnDrawListener listener : mcv.getDayViewOnDrawListeners()) {
+                    if (listener.shouldReDraw((DayView) view)) {
+                        shouldReDraw = true;
+                        break;
+                    }
+                }
+                if (shouldReDraw) {
+                    view.invalidate();
+                }
+            }
+            LayoutParams params = (LayoutParams) view.getLayoutParams();
+            params.scalePercent = scalePercent;
+            params.remainingSpaceOfRow = space;
             int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
                     measureTileSize,
                     MeasureSpec.EXACTLY
             );
 
             int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                    measureTileSize + space,
+                    measureTileSize,
                     MeasureSpec.EXACTLY
             );
             view.measure(childWidthMeasureSpec, childHeightMeasureSpec);
@@ -294,25 +312,18 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         final int parentLeft = 0;
 
         int childTop = 0;
-        int space = getMeasureRemainingSpaceForRow();
-        if (isShowWeekDayView()) {
-            childTop = layout(weekDayViews, parentLeft, parentLeft, childTop, space);
+        if (mcv.isShowWeekDayView()) {
+            childTop = layout(weekDayViews, parentLeft, parentLeft, childTop);
         }
-        childTop = layout(dayViews, parentLeft, parentLeft, childTop, space);
+        childTop = layout(dayViews, parentLeft, parentLeft, childTop);
     }
 
-    private int getMeasureRemainingSpaceForRow() {
-        int space = 0;
-        if (isVerticalSplit()) {
-            int tileRowCount = getActualWeekCount() + (isShowWeekDayView() ? 1 : 0);
-            space = (getMeasuredHeight() - measureTileSize * tileRowCount) / tileRowCount;
-        }
-        return space;
-    }
-
-    private int layout(List<? extends View> views, int parentLeft, int childLeft, int top, int space) {
+    private int layout(List<? extends View> views, int parentLeft, int childLeft, int top) {
+        int space;
         for (int i = 0; i < views.size(); i++) {
             final View child = views.get(i);
+            LayoutParams params = (LayoutParams) child.getLayoutParams();
+            space = params.remainingSpaceOfRow;
 
             final int width = child.getMeasuredWidth();
             final int height = child.getMeasuredHeight();
@@ -376,13 +387,18 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     /**
      * Simple layout params class for MonthView, since every child is the same size
      */
-    protected static class LayoutParams extends MarginLayoutParams {
-
+    public static class LayoutParams extends MarginLayoutParams {
+        public int remainingSpaceOfRow;
+        public float scalePercent;
         /**
          * {@inheritDoc}
          */
         public LayoutParams() {
             super(WRAP_CONTENT, WRAP_CONTENT);
         }
+    }
+
+    List<DayView> getDayViews() {
+        return dayViews;
     }
 }

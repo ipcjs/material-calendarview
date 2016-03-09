@@ -22,7 +22,6 @@ import java.util.List;
 abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAdapter {
 
     private final ArrayDeque<V> currentViews;
-
     protected final MaterialCalendarView mcv;
     private final CalendarDay today;
 
@@ -160,6 +159,11 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         currentViews.add(pagerView);
 
         pagerView.setDayViewDecorators(decoratorResults);
+        for (DayView view : pagerView.getDayViews()) {
+            for (DayView.DecorateListener listener : mcv.getDayViewDecorateListeners()) {
+                listener.decorate(view);
+            }
+        }
 
         return pagerView;
     }
@@ -330,5 +334,9 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
 
     public int getFirstDayOfWeek() {
         return firstDayOfTheWeek;
+    }
+
+    ArrayDeque<V> getCurrentViews() {
+        return currentViews;
     }
 }

@@ -111,9 +111,14 @@ public class MaterialCalendarView extends ViewGroup {
     }
 
     public boolean isVerticalSplit() {
-        // TODO: 2016/3/8
-        return true;
+        return verticalSplit;
     }
+
+    public void setVerticalSplit(boolean verticalSplit) {
+        this.verticalSplit = verticalSplit;
+        requestLayout();
+    }
+
     /**
      * Do not show any non-enabled dates
      */
@@ -165,12 +170,16 @@ public class MaterialCalendarView extends ViewGroup {
     private CalendarDay currentMonth;
     private LinearLayout topbar;
     private CalendarMode calendarMode = CalendarMode.MONTHS;
+    private boolean verticalSplit = false;
+    private boolean showWeekDayView = true;
     /**
      * Used for the dynamic calendar height.
      */
     private boolean mDynamicHeightEnabled;
 
     private final ArrayList<DayViewDecorator> dayViewDecorators = new ArrayList<>();
+    private final List<DayView.DecorateListener> dayViewDecorateListeners = new ArrayList<>();
+    private final List<DayView.OnDrawListener> dayViewOnDrawListeners = new ArrayList<>();
 
     private final OnClickListener onClickListener = new OnClickListener() {
         @Override
@@ -1149,6 +1158,33 @@ public class MaterialCalendarView extends ViewGroup {
         adapter.setDecorators(dayViewDecorators);
     }
 
+    private void refreshCurrentDayViews() {
+        for (CalendarPagerView pagerView : adapter.getCurrentViews()) {
+            for (DayView view : pagerView.getDayViews()) {
+                for (DayView.DecorateListener listener : dayViewDecorateListeners) {
+                    listener.decorate(view);
+                }
+            }
+        }
+    }
+
+    public void addDayViewDecorateListener(DayView.DecorateListener listener) {
+        dayViewDecorateListeners.add(listener);
+        refreshCurrentDayViews();
+    }
+
+    public void addDayViewOnDrawListener(DayView.OnDrawListener listener) {
+        dayViewOnDrawListeners.add(listener);
+    }
+
+    List<DayView.DecorateListener> getDayViewDecorateListeners() {
+        return dayViewDecorateListeners;
+    }
+
+    List<DayView.OnDrawListener> getDayViewOnDrawListeners() {
+        return dayViewOnDrawListeners;
+    }
+
     /**
      * Remove all decorators
      */
@@ -1379,8 +1415,12 @@ public class MaterialCalendarView extends ViewGroup {
     }
 
     public boolean isShowWeekDayView() {
-        // TODO: 2016/3/8
-        return true;
+        return showWeekDayView;
+    }
+
+    public void setShowWeekDayView(boolean showWeekDayView) {
+        this.showWeekDayView = showWeekDayView;
+        requestLayout();
     }
 
     private int measureTileSize;
@@ -1420,6 +1460,17 @@ public class MaterialCalendarView extends ViewGroup {
             weekCount = CalendarUtils.getWeekCountOfMonth(cal, getFirstDayOfWeek());
         }
         return weekCount;
+    }
+
+    float getScalePercent() {
+        if (getParent() instanceof ViewGroup && ((ViewGroup) getParent()).getMeasuredHeight() != 0) {
+            int maxHeight = ((ViewGroup) getParent()).getMeasuredHeight();
+            int normalHeight = getMeasureNormalHeight();
+            int curHeight = getMeasuredHeight();
+            return 1.0f * (curHeight - normalHeight) / (maxHeight - normalHeight);
+        } else {
+            return 0;
+        }
     }
 
     /**

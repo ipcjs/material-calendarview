@@ -24,7 +24,7 @@ public class WeekView extends CalendarPagerView {
     }
 
     @Override
-    protected int getAddWeekCount() {
+    protected int getAddedWeekCount() {
         return 1;
     }
 

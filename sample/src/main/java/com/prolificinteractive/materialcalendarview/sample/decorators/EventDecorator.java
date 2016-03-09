@@ -8,6 +8,8 @@ import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 import java.util.Collection;
 import java.util.HashSet;
 
+import static com.github.ipcjs.explorer.ExUtils.p;
+
 /**
  * Decorate several days with a dot
  */
@@ -23,6 +25,7 @@ public class EventDecorator implements DayViewDecorator {
 
     @Override
     public boolean shouldDecorate(CalendarDay day) {
+        p();
         return dates.contains(day);
     }
 

@@ -19,7 +19,7 @@ class MonthView extends CalendarPagerView {
     }
 
     @Override
-    protected int getAddWeekCount() {
+    protected int getAddedWeekCount() {
         return DEFAULT_MAX_WEEKS;
     }
 

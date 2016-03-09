@@ -35,8 +35,7 @@ import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.
  * Display one day of a {@linkplain MaterialCalendarView}
  */
 @SuppressLint("ViewConstructor")
-class DayView extends CheckedTextView {
-
+public class DayView extends CheckedTextView {
     private CalendarDay date;
     private int selectionColor = Color.GRAY;
 
@@ -50,9 +49,11 @@ class DayView extends CheckedTextView {
     private boolean isDecoratedDisabled = false;
     @ShowOtherDates
     private int showOtherDates = MaterialCalendarView.SHOW_DEFAULTS;
+    private MaterialCalendarView mcv;
 
-    public DayView(Context context, CalendarDay day) {
+    public DayView(Context context, CalendarDay day, MaterialCalendarView mcv) {
         super(context);
+        this.mcv = mcv;
 
         fadeTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -174,6 +175,9 @@ class DayView extends CheckedTextView {
             customBackground.draw(canvas);
         }
         super.onDraw(canvas);
+        for (OnDrawListener listener : mcv.getDayViewOnDrawListeners()) {
+            listener.onDraw(this, canvas);
+        }
     }
 
     private void regenerateBackground() {
@@ -241,5 +245,23 @@ class DayView extends CheckedTextView {
         else {
             setText(getLabel());
         }
+    }
+
+    /**
+     * Created by JiangSong on 2016/3/9.
+     */
+    public interface DecorateListener {
+        void decorate(DayView view);
+    }
+
+    public interface OnDrawListener {
+        /**
+         * 该方法只是用来优化重绘时的性能, 返回false, onDraw也可能被调用~~;
+         * @param view
+         * @return true, DayView的Parent大小改变时, 重绘DayView;
+         */
+        boolean shouldReDraw(DayView view);
+
+        void onDraw(DayView view, Canvas canvas);
     }
 }
