@@ -1506,7 +1506,7 @@ public class MaterialCalendarView extends ViewGroup {
     public int getCurSelectedItemBottom() {
         CalendarPagerView pagerView = adapter.getPrimaryItem();
         CalendarDay selectedDay = getSelectedDate();
-        if (pagerView != null && selectedDay != null && pagerView.isDayEnabled(selectedDay)) {
+        if (pagerView != null && selectedDay != null && getCalendarMode().isSameRange(pagerView.getFirstViewDay(), selectedDay)) {
             int weekDayViewRowCount = isShowWeekDayView() ? 1 : 0;
             int topbarRowCount = getTopbarVisible() ? 1 : 0;
 

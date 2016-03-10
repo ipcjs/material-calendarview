@@ -28,7 +28,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_calendar);
+        setContentView(R.layout.fragment_calendar_2);
         RecyclerView recyclerView = $(R.id.view_list);
         MaterialCalendarView materialCalendarView = $(R.id.view_calendar_month);
 
