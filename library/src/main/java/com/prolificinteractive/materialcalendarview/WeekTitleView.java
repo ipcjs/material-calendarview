@@ -101,18 +101,18 @@ public class WeekTitleView extends ViewGroup {
 
             }
         }
-        int measuredHeight = 0;
+        int maxChildHeight = 0;
         for (WeekDayView view : weekDayViews) {
             view.measure(
                     MeasureSpec.makeMeasureSpec(measureTileSize, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(childHeightSpecSize, childHeightSpecMode)
             );
-            if (view.getMeasuredHeight() > measuredHeight) {
-                measuredHeight = view.getMeasuredHeight();
+            if (view.getMeasuredHeight() > maxChildHeight) {
+                maxChildHeight = view.getMeasuredHeight();
             }
         }
 
-        setMeasuredDimension(widthSpecSize, measuredHeight);
+        setMeasuredDimension(widthSpecSize, maxChildHeight + heightPadding);
     }
 
     @Override

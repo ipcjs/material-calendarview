@@ -37,6 +37,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
         ArrayList<CalendarDay> dates = new ArrayList<>();
         dates.add(CalendarDay.from(new Date()));
         materialCalendarView.addDecorator(new EventDecorator(Color.RED, dates));
+        materialCalendarView.setAutoSelectOnSingleMode(true);
         materialCalendarView.addDayViewDecorateListener(new DayView.DecorateListener() {
             @Override
             public void decorate(DayView view) {

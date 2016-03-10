@@ -5,6 +5,8 @@
               android:orientation="vertical">
 
     <com.prolificinteractive.materialcalendarview.WeekTitleView
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
