@@ -65,7 +65,9 @@ public class CalendarUtils {
         to.set(year, month, day);
     }
 
-    public static int getWeekCountOfMonth(Calendar cal, int firstDayOfWeek) {
+    public static int getWeekCountOfMonth(CalendarDay day, int firstDayOfWeek) {
+        Calendar cal = Calendar.getInstance();
+        day.copyTo(cal);
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
         //noinspection ResourceType
         cal.setFirstDayOfWeek(firstDayOfWeek);

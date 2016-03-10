@@ -189,6 +189,17 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         container.removeView(pagerView);
     }
 
+    private CalendarPagerView primaryItem;
+
+    public CalendarPagerView getPrimaryItem() {
+        return primaryItem;
+    }
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        primaryItem = (CalendarPagerView) object;
+    }
+
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view == object;

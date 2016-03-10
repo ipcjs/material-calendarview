@@ -167,10 +167,12 @@ public final class CalendarDay implements Parcelable {
 
     /**
      * Get this day as a {@linkplain Calendar}
+     * 废弃, 该方法返回的对象有可能被外部修改, 故不推荐使用; 使用{@link #copyTo(Calendar)}替代
      *
      * @return a new calendar instance with this day information
      */
     @NonNull
+    @Deprecated
     public Calendar getCalendar() {
         if (_calendar == null) {
             _calendar = CalendarUtils.getInstance();

@@ -238,6 +238,16 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         return new LayoutParams();
     }
 
+    private int actualRowHeight;
+
+    public int getActualRowHeight() {
+        return actualRowHeight;
+    }
+
+    public int getMeasureTileSize() {
+        return measureTileSize;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -263,8 +273,8 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         float scalePercent = 0;
         if (mcv.isVerticalSplit()) {
             int actualTileRowCount = getActualWeekCount() + (mcv.isShowWeekDayView() ? 1 : 0);
-            int actualHeight = getMeasuredHeight();
-            spaceOfRow = (actualHeight - measureTileSize * actualTileRowCount) / actualTileRowCount;
+            actualRowHeight = getMeasuredHeight() / actualTileRowCount;
+            spaceOfRow = actualRowHeight - measureTileSize;
             scalePercent = mcv.getScalePercent();
         }
 

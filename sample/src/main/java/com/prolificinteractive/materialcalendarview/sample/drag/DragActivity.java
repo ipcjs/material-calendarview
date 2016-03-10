@@ -30,16 +30,13 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_calendar);
         RecyclerView recyclerView = $(R.id.view_list);
-        MaterialCalendarView materialCalendarView = $(R.id.view_calendar);
+        MaterialCalendarView materialCalendarView = $(R.id.view_calendar_month);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new ItemListFragment.SimpleListAdapter(ItemListFragment.generateList(20)));
         ArrayList<CalendarDay> dates = new ArrayList<>();
         dates.add(CalendarDay.from(new Date()));
         materialCalendarView.addDecorator(new EventDecorator(Color.RED, dates));
-        materialCalendarView.setVerticalSplit(true);
-        materialCalendarView.setShowWeekDayView(false);
-        materialCalendarView.setTopbarVisible(false);
         materialCalendarView.addDayViewDecorateListener(new DayView.DecorateListener() {
             @Override
             public void decorate(DayView view) {

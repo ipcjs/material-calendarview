@@ -15,7 +15,7 @@ class MonthView extends CalendarPagerView {
 
     @Override
     protected int getActualWeekCount() {
-        return CalendarUtils.getWeekCountOfMonth(getFirstViewDay().getCalendar(), getFirstDayOfWeek());
+        return CalendarUtils.getWeekCountOfMonth(getFirstViewDay(), getFirstDayOfWeek());
     }
 
     @Override

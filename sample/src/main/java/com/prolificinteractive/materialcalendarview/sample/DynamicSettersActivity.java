@@ -93,7 +93,7 @@ public class DynamicSettersActivity extends AppCompatActivity {
 
     @OnCheckedChanged(R.id.check_dynamic_height_enabled)
     void xx(boolean checked) {
-        widget.setDynamicHeightEnabled(checked);
+        widget.setLayoutMode(MaterialCalendarView.LAYOUT_MODE_DYNAMIC_HEIGHT);
     }
 
     @OnCheckedChanged(R.id.check_week_mode_enabled)

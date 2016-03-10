@@ -475,6 +475,10 @@ public class MaterialCalendarView extends ViewGroup {
         updateUi();
     }
 
+    public CalendarMode getCalendarMode() {
+        return calendarMode;
+    }
+
     /**
      * Get the current selection mode. The default mode is {@linkplain #SELECTION_MODE_SINGLE}
      *
@@ -510,14 +514,6 @@ public class MaterialCalendarView extends ViewGroup {
      */
     boolean isDynamicHeightEnabled() {
         return layoutMode == LAYOUT_MODE_DYNAMIC_HEIGHT;
-    }
-
-    public int getCurSelectedItemBottom() {
-        if (getSelectionMode() == SELECTION_MODE_SINGLE) {
-            // TODO: 2016/3/10
-            return getMeasuredHeight() - getMeasureMinHeight();
-        }
-        return 0;
     }
 
     /**
@@ -1440,10 +1436,6 @@ public class MaterialCalendarView extends ViewGroup {
 
     private int measureTileSize;
 
-    public int getMeasureTileSize() {
-        return measureTileSize;
-    }
-
     public int getMeasureNormalHeight() {
         return measureTileSize * getTileRowCount();
     }
@@ -1453,7 +1445,7 @@ public class MaterialCalendarView extends ViewGroup {
     }
 
     private int getTileRowCount() {
-        return getWeekCountBasedOnMode() + getOtherRowCount();
+        return getWeekRowCount() + getOtherRowCount();
     }
 
     private int getOtherRowCount() {
@@ -1467,12 +1459,12 @@ public class MaterialCalendarView extends ViewGroup {
         return count;
     }
 
-    private int getWeekCountBasedOnMode() {
+    private int getWeekRowCount() {
         int weekCount = calendarMode.visibleWeeksCount;
         boolean isInMonthsMode = calendarMode.equals(CalendarMode.MONTHS);
         if (isInMonthsMode && isDynamicHeightEnabled() && adapter != null && pager != null) {
-            Calendar cal = (Calendar) adapter.getItem(pager.getCurrentItem()).getCalendar().clone();
-            weekCount = CalendarUtils.getWeekCountOfMonth(cal, getFirstDayOfWeek());
+            CalendarDay day = adapter.getItem(pager.getCurrentItem());
+            weekCount = CalendarUtils.getWeekCountOfMonth(day, getFirstDayOfWeek());
         }
         return weekCount;
     }
@@ -1486,6 +1478,23 @@ public class MaterialCalendarView extends ViewGroup {
         } else {
             return 0;
         }
+    }
+
+    public int getCurSelectedItemBottom() {
+        CalendarPagerView pagerView = adapter.getPrimaryItem();
+        CalendarDay selectedDay = getSelectedDate();
+        if (pagerView != null && selectedDay != null && pagerView.isDayEnabled(selectedDay)) {
+            int weekDayViewRowCount = isShowWeekDayView() ? 1 : 0;
+            int topbarRowCount = getTopbarVisible() ? 1 : 0;
+
+            Calendar c = Calendar.getInstance();
+            selectedDay.copyTo(c);
+            c.setFirstDayOfWeek(getFirstDayOfWeek());
+            int weekOfMonth = c.get(Calendar.WEEK_OF_MONTH);// 选中的行, 属于本月的第几周
+            int bottom = (int) ((weekOfMonth + weekDayViewRowCount - 1) * pagerView.getActualRowHeight() + pagerView.getMeasureTileSize() + 0.5f);
+            return bottom + topbarRowCount * measureTileSize;
+        }
+        return getMeasuredHeight();
     }
 
     /**

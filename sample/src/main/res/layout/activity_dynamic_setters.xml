@@ -173,8 +173,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
-
-
             <CheckBox
                 android:id="@+id/check_week_mode_enabled"
                 android:layout_width="0dp"
@@ -190,7 +188,6 @@
                 android:layout_weight="1"
                 android:text="Dynamic Height Enabled"
                 />
-
         </LinearLayout>
 
     </LinearLayout>
