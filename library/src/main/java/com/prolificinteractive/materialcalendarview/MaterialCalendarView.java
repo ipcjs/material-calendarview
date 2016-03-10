@@ -188,6 +188,7 @@ public class MaterialCalendarView extends ViewGroup {
     private final ArrayList<DayViewDecorator> dayViewDecorators = new ArrayList<>();
     private final List<DayView.DecorateListener> dayViewDecorateListeners = new ArrayList<>();
     private final List<DayView.OnDrawListener> dayViewOnDrawListeners = new ArrayList<>();
+    private boolean autoSelectOnSingleMode = false;
 
     private final OnClickListener onClickListener = new OnClickListener() {
         @Override
@@ -207,6 +208,17 @@ public class MaterialCalendarView extends ViewGroup {
             currentMonth = adapter.getItem(position);
             updateUi();
 
+            if (isAutoSelectOnSingleMode() && getSelectionMode() == SELECTION_MODE_SINGLE) {
+                CalendarDay selectedDay;
+                CalendarDay today = CalendarDay.today();
+                if (getCalendarMode().isSameRange(today, currentMonth)) {
+                    selectedDay = today;
+                } else {
+                    selectedDay = currentMonth;
+                }
+                clearSelection();
+                setDateSelectedAndCallback(selectedDay, true);
+            }
             dispatchOnMonthChanged(currentMonth);
         }
 
@@ -433,13 +445,21 @@ public class MaterialCalendarView extends ViewGroup {
                 this.selectionMode = SELECTION_MODE_NONE;
                 if (oldMode != SELECTION_MODE_NONE) {
                     //No selection! Clear out!
-                    clearSelection();
+                    clearSelectionAndCallback();
                 }
             }
             break;
         }
 
         adapter.setSelectionEnabled(selectionMode != SELECTION_MODE_NONE);
+    }
+
+    public void setAutoSelectOnSingleMode(boolean autoSelectOnSingleMode) {
+        this.autoSelectOnSingleMode = autoSelectOnSingleMode;
+    }
+
+    public boolean isAutoSelectOnSingleMode() {
+        return autoSelectOnSingleMode;
     }
 
     /**
@@ -689,20 +709,29 @@ public class MaterialCalendarView extends ViewGroup {
         return adapter.getSelectedDates();
     }
 
+    private void clearSelection() {
+        adapter.clearSelections();
+    }
     /**
      * Clear the currently selected date(s)
      */
-    public void clearSelection() {
+    public void clearSelectionAndCallback() {
         List<CalendarDay> dates = getSelectedDates();
-        adapter.clearSelections();
+        clearSelection();
         for (CalendarDay day : dates) {
             dispatchOnDateSelected(day, false);
         }
     }
 
+    public void setDateSelectedAndCallback(@NonNull CalendarDay date, boolean selected) {
+        adapter.setDateSelected(date, selected);
+        dispatchOnDateSelected(date, selected);
+    }
+
     /**
      * @param calendar a Calendar set to a day to select. Null to clear selection
      */
+    @Deprecated
     public void setSelectedDate(@Nullable Calendar calendar) {
         setSelectedDate(CalendarDay.from(calendar));
     }
@@ -710,6 +739,7 @@ public class MaterialCalendarView extends ViewGroup {
     /**
      * @param date a Date to set as selected. Null to clear selection
      */
+    @Deprecated
     public void setSelectedDate(@Nullable Date date) {
         setSelectedDate(CalendarDay.from(date));
     }
@@ -717,8 +747,9 @@ public class MaterialCalendarView extends ViewGroup {
     /**
      * @param date a Date to set as selected. Null to clear selection
      */
+    @Deprecated
     public void setSelectedDate(@Nullable CalendarDay date) {
-        clearSelection();
+        clearSelectionAndCallback();
         if (date != null) {
             setDateSelected(date, true);
         }
@@ -728,6 +759,7 @@ public class MaterialCalendarView extends ViewGroup {
      * @param calendar a Calendar to change. Passing null does nothing
      * @param selected true if day should be selected, false to deselect
      */
+    @Deprecated
     public void setDateSelected(@Nullable Calendar calendar, boolean selected) {
         setDateSelected(CalendarDay.from(calendar), selected);
     }
@@ -736,6 +768,7 @@ public class MaterialCalendarView extends ViewGroup {
      * @param date     a Date to change. Passing null does nothing
      * @param selected true if day should be selected, false to deselect
      */
+    @Deprecated
     public void setDateSelected(@Nullable Date date, boolean selected) {
         setDateSelected(CalendarDay.from(date), selected);
     }
@@ -744,6 +777,7 @@ public class MaterialCalendarView extends ViewGroup {
      * @param day      a CalendarDay to change. Passing null does nothing
      * @param selected true if day should be selected, false to deselect
      */
+    @Deprecated
     public void setDateSelected(@Nullable CalendarDay day, boolean selected) {
         if (day == null) {
             return;
@@ -1006,7 +1040,7 @@ public class MaterialCalendarView extends ViewGroup {
         setWeekDayTextAppearance(ss.weekDayTextAppearance);
         setShowOtherDates(ss.showOtherDates);
         setRangeDates(ss.minDate, ss.maxDate);
-        clearSelection();
+        clearSelectionAndCallback();
         for (CalendarDay calendarDay : ss.selectedDates) {
             setDateSelected(calendarDay, true);
         }
@@ -1278,27 +1312,16 @@ public class MaterialCalendarView extends ViewGroup {
     protected void onDateClicked(@NonNull CalendarDay date, boolean nowSelected) {
         switch (selectionMode) {
             case SELECTION_MODE_MULTIPLE: {
-                adapter.setDateSelected(date, nowSelected);
-                dispatchOnDateSelected(date, nowSelected);
+                setDateSelectedAndCallback(date, nowSelected);
             }
             break;
             default:
             case SELECTION_MODE_SINGLE: {
-                adapter.clearSelections();
-                adapter.setDateSelected(date, true);
-                dispatchOnDateSelected(date, true);
+                clearSelection();
+                setDateSelectedAndCallback(date, true);
             }
             break;
         }
-    }
-
-    /**
-     * Called by the adapter for cases when changes in state result in dates being unselected
-     *
-     * @param date date that should be de-selected
-     */
-    protected void onDateUnselected(CalendarDay date) {
-        dispatchOnDateSelected(date, false);
     }
 
     /*

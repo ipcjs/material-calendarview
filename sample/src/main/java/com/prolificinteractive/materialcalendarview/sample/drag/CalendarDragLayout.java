@@ -104,7 +104,7 @@ public class CalendarDragLayout extends ViewGroup {
         int top = mTop;
         top = layoutChildVertical(mCalendarView, top);
         top = layoutChildVertical(mListView, top);
-        mWeekCalendarView.setVisibility(mTop + mCalendarView.getCurSelectedItemBottom() > mWeekCalendarView.getMeasuredHeight() ? GONE : VISIBLE);
+        mWeekCalendarView.setVisibility(mTop + mCalendarView.getCurSelectedItemBottom() >= mWeekCalendarView.getMeasuredHeight() ? GONE : VISIBLE);
     }
 
     private void measureCalendar() {

@@ -320,7 +320,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
 
             if ((minDate != null && minDate.isAfter(date)) || (maxDate != null && maxDate.isBefore(date))) {
                 selectedDates.remove(i);
-                mcv.onDateUnselected(date);
+                mcv.dispatchOnDateSelected(date, false);
                 i -= 1;
             }
         }

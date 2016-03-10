@@ -175,7 +175,7 @@ public class DynamicSettersActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_clear_selection)
     void onClearSelection() {
-        widget.clearSelection();
+        widget.clearSelectionAndCallback();
     }
 
     @OnClick(R.id.button_selection_mode)
