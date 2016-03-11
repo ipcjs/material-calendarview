@@ -104,7 +104,11 @@ public class CalendarDragLayout extends ViewGroup {
         int top = mTop;
         top = layoutChildVertical(mCalendarView, top);
         top = layoutChildVertical(mListView, top);
-        mWeekCalendarView.setVisibility(mTop + mCalendarView.getCurSelectedItemBottom() >= mWeekCalendarView.getMeasuredHeight() ? GONE : VISIBLE);
+
+        int curSelectedItemBottom = mCalendarView.getCurSelectedItemBottom();
+        boolean isCalendarBottom = curSelectedItemBottom == mCalendarView.getMeasuredHeight();
+        int delta = mTop + curSelectedItemBottom - mWeekCalendarView.getMeasuredHeight();
+        mWeekCalendarView.setVisibility((delta > 0 || (delta == 0 && !isCalendarBottom)) ? GONE : VISIBLE);
     }
 
     private void measureCalendar() {
