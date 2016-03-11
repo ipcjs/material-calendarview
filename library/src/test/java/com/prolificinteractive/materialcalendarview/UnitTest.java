@@ -3,14 +3,24 @@ package com.prolificinteractive.materialcalendarview;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.Locale;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by ipcjs on 2016/3/8.
  */
 public class UnitTest {
     @Test
-    public void test() {
+    public void testSet() {
         Calendar c = Calendar.getInstance();
-        c.get(Calendar.)
+        c.clear();
+        c.set(Calendar.YEAR, 2016);
+        c.set(Calendar.MONTH, Calendar.JANUARY);
+        c.set(Calendar.DAY_OF_MONTH, 1);
+//        c.getTime();
+
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONTH);
+        assertEquals("周一", c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()));
     }
 }
