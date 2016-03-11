@@ -1,6 +1,7 @@
 package com.prolificinteractive.materialcalendarview;
 
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -295,7 +296,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
                     }
                 }
                 if (shouldReDraw) {
-                    view.invalidate();
+                    ViewCompat.postInvalidateOnAnimation(view);
                 }
             }
             LayoutParams params = (LayoutParams) view.getLayoutParams();

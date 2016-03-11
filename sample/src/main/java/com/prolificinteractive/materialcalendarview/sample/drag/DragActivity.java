@@ -57,7 +57,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
 
             @Override
             public boolean shouldReDraw(DayView view) {
-                return view.getDate().getDay() % 5 == 0;
+                return /*view.getDate().getDay() % 5 == 0*/true;
             }
 
             @Override
