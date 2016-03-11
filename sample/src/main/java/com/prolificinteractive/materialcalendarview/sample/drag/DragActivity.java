@@ -21,6 +21,8 @@ import com.prolificinteractive.materialcalendarview.sample.decorators.EventDecor
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.github.ipcjs.explorer.ExUtils.p;
+
 /**
  * Created by ipcjs on 2016/3/7.
  */
@@ -60,9 +62,10 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
                 return /*view.getDate().getDay() % 5 == 0*/true;
             }
 
+            private int count = 0;
             @Override
             public void onDraw(DayView view, Canvas canvas) {
-//                p();
+                p("draw", ++count, view.getDate());
                 if (shouldReDraw(view)) {
                     CalendarPagerView.LayoutParams params = (CalendarPagerView.LayoutParams) view.getLayoutParams();
                     paint.setColor(setAlpha(paint.getColor(), params.scalePercent));
