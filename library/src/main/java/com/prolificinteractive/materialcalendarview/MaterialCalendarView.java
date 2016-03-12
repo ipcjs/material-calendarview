@@ -189,6 +189,7 @@ public class MaterialCalendarView extends ViewGroup {
     private final List<DayView.DecorateListener> dayViewDecorateListeners = new ArrayList<>();
     private final List<DayView.OnDrawListener> dayViewOnDrawListeners = new ArrayList<>();
     private boolean autoSelectOnSingleMode = false;
+    private CalendarPagerView.OnDrawListener pagerOnDrawListener;
 
     private final OnClickListener onClickListener = new OnClickListener() {
         @Override
@@ -712,6 +713,7 @@ public class MaterialCalendarView extends ViewGroup {
     private void clearSelection() {
         adapter.clearSelections();
     }
+
     /**
      * Clear the currently selected date(s)
      */
@@ -1082,7 +1084,7 @@ public class MaterialCalendarView extends ViewGroup {
         int tileSizePx = -1;
         boolean topbarVisible = true;
         int selectionMode = SELECTION_MODE_SINGLE;
-//        boolean dynamicHeightEnabled = false;
+        //        boolean dynamicHeightEnabled = false;
         int layoutMode;
 
         SavedState(Parcelable superState) {
@@ -1163,6 +1165,7 @@ public class MaterialCalendarView extends ViewGroup {
     /**
      * @return The first day of the week as a {@linkplain Calendar} day constant.
      */
+    @CalendarPagerView.DayOfWeek
     public int getFirstDayOfWeek() {
         return adapter.getFirstDayOfWeek();
     }
@@ -1228,6 +1231,14 @@ public class MaterialCalendarView extends ViewGroup {
 
     List<DayView.OnDrawListener> getDayViewOnDrawListeners() {
         return dayViewOnDrawListeners;
+    }
+
+    public void setPagerOnDrawListener(CalendarPagerView.OnDrawListener pagerOnDrawListener) {
+        this.pagerOnDrawListener = pagerOnDrawListener;
+    }
+
+    public CalendarPagerView.OnDrawListener getPagerOnDrawListener() {
+        return pagerOnDrawListener;
     }
 
     /**
@@ -1624,6 +1635,7 @@ public class MaterialCalendarView extends ViewGroup {
          * @param tileHeight view height in number of tiles
          */
         public int tileHeight;
+
         public LayoutParams(int tileHeight) {
             super(MATCH_PARENT, WRAP_CONTENT);
             this.tileHeight = tileHeight;

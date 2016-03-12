@@ -343,6 +343,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         return weekDayTextAppearance == null ? 0 : weekDayTextAppearance;
     }
 
+    @CalendarPagerView.DayOfWeek
     public int getFirstDayOfWeek() {
         return firstDayOfTheWeek;
     }

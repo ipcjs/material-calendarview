@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import com.prolificinteractive.materialcalendarview.sample.R;
 import com.prolificinteractive.materialcalendarview.sample.decorators.EventDecorator;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.github.ipcjs.explorer.ExUtils.p;
@@ -49,7 +51,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
                 }
             }
         });
-        materialCalendarView.addDayViewOnDrawListener(new DayView.OnDrawListener() {
+        final DayView.OnDrawListener dayViewOnDrawListener = new DayView.OnDrawListener() {
             private Paint paint;
 
             {
@@ -63,6 +65,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
             }
 
             private int count = 0;
+
             @Override
             public void onDraw(DayView view, Canvas canvas) {
                 p("draw", ++count, view.getDate());
@@ -70,6 +73,30 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
                     CalendarPagerView.LayoutParams params = (CalendarPagerView.LayoutParams) view.getLayoutParams();
                     paint.setColor(setAlpha(paint.getColor(), params.scalePercent));
                     canvas.drawText(params.remainingSpaceOfRow + ", " + params.scalePercent, 0, 100, paint);
+                }
+            }
+        };
+//        materialCalendarView.addDayViewOnDrawListener(dayViewOnDrawListener);
+        materialCalendarView.setPagerOnDrawListener(new CalendarPagerView.OnDrawListener() {
+
+            private Paint paint;
+
+            {
+                paint = new Paint();
+                paint.setTextSize(50);
+            }
+
+            @Override
+            public void onDraw(CalendarPagerView view, CalendarDay firstDay, Canvas canvas) {
+                final int actualMaximum = firstDay.getCalendar().getActualMaximum(Calendar.DAY_OF_MONTH);
+                final int actualMinimum = firstDay.getCalendar().getActualMinimum(Calendar.DAY_OF_MONTH);
+                Point point = new Point();
+                for (int i = actualMinimum; i <= actualMaximum; i++) {
+                    canvas.save();
+                    view.getCalendarDayPoint(i, point);
+                    canvas.translate(point.x, point.y);
+                    canvas.drawText("" + view.getScalePercent(), 0, view.getActualRowHeight(), paint);
+                    canvas.restore();
                 }
             }
         });

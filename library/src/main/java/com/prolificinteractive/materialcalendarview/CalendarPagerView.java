@@ -1,5 +1,9 @@
 package com.prolificinteractive.materialcalendarview;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -12,6 +16,8 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView.ShowOth
 import com.prolificinteractive.materialcalendarview.format.DayFormatter;
 import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -25,6 +31,7 @@ import static java.util.Calendar.DAY_OF_WEEK;
 public abstract class CalendarPagerView extends ViewGroup implements View.OnClickListener {
 
     protected static final int DEFAULT_DAYS_IN_WEEK = 7;
+    private static final Calendar tmpCalendar = CalendarUtils.getInstance();
     private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
     private final List<DayView> dayViews = new ArrayList<>();
     private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<>();
@@ -45,6 +52,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         this.mcv = view;
         this.firstViewDay = firstViewDay;
         this.firstDayOfWeek = firstDayOfWeek;
+        setBackgroundColor(Color.YELLOW);
 
         setClipChildren(false);
         setClipToPadding(false);
@@ -85,22 +93,21 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
      * @return
      */
     protected Calendar getFirstDayOfGrid() {
-        Calendar tempWorkingCalendar = CalendarUtils.getInstance();
-
-        getFirstViewDay().copyTo(tempWorkingCalendar);
+        getFirstViewDay().copyTo(tmpCalendar);
         //noinspection ResourceType
-        tempWorkingCalendar.setFirstDayOfWeek(getFirstDayOfWeek());
-        int dow = CalendarUtils.getDayOfWeek(tempWorkingCalendar);
+        tmpCalendar.setFirstDayOfWeek(getFirstDayOfWeek());
+        int dow = CalendarUtils.getDayOfWeek(tmpCalendar);
         int delta = getFirstDayOfWeek() - dow;
         //If the delta is positive, we want to remove a week
         boolean removeRow = showOtherMonths(showOtherDates) ? delta >= 0 : delta > 0;
         if (removeRow) {
             delta -= DEFAULT_DAYS_IN_WEEK;
         }
-        tempWorkingCalendar.add(DATE, delta);
-        return tempWorkingCalendar;
+        tmpCalendar.add(DATE, delta);
+        return tmpCalendar;
     }
 
+    @DayOfWeek
     protected int getFirstDayOfWeek() {
         return firstDayOfWeek;
     }
@@ -249,6 +256,12 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         return measureTileSize;
     }
 
+    private float scalePercent;
+
+    public float getScalePercent() {
+        return scalePercent;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -266,12 +279,12 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
         //The spec width should be a correct multiple
         measureTileSize = specWidthSize / DEFAULT_DAYS_IN_WEEK;
-        
+
         //Just use the spec sizes
         setMeasuredDimension(specWidthSize, specHeightSize);
 
         int spaceOfRow = 0;
-        float scalePercent = 0;
+        scalePercent = 0;
         if (mcv.isVerticalSplit()) {
             int actualTileRowCount = getActualWeekCount() + (mcv.isShowWeekDayView() ? 1 : 0);
             actualRowHeight = getMeasuredHeight() / actualTileRowCount;
@@ -391,7 +404,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         info.setClassName(CalendarPagerView.class.getName());
     }
 
-    protected CalendarDay getFirstViewDay() {
+    public CalendarDay getFirstViewDay() {
         return firstViewDay;
     }
 
@@ -401,6 +414,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     public static class LayoutParams extends MarginLayoutParams {
         public int remainingSpaceOfRow;
         public float scalePercent;
+
         /**
          * {@inheritDoc}
          */
@@ -411,5 +425,53 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
     List<DayView> getDayViews() {
         return dayViews;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        if (mcv.getPagerOnDrawListener() != null) {
+            mcv.getPagerOnDrawListener().onDraw(this, getFirstViewDay(), canvas);
+        }
+    }
+
+    private int getOtherRowCount() {
+        return mcv.isShowWeekDayView() ? 1 : 0;
+    }
+
+    @IntDef({
+            Calendar.SUNDAY,
+            Calendar.MONDAY,
+            Calendar.TUESDAY,
+            Calendar.WEDNESDAY,
+            Calendar.THURSDAY,
+            Calendar.FRIDAY,
+            Calendar.SATURDAY,
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    @interface DayOfWeek {
+
+    }
+
+    public Point getCalendarDayPoint(int day, Point outPoint) {
+        return getCalendarDayPoint(CalendarDay.from(getFirstViewDay().getYear(), getFirstViewDay().getMonth(), day), outPoint);
+    }
+
+    public Point getCalendarDayPoint(CalendarDay day, Point outPoint) {
+        day.copyTo(tmpCalendar);
+        final int firstDayOfWeek = getFirstDayOfWeek();
+        tmpCalendar.setFirstDayOfWeek(firstDayOfWeek);
+        final int dayOfWeek = tmpCalendar.get(DAY_OF_WEEK);
+        int col = dayOfWeek - firstDayOfWeek;
+        if (col < 0) {
+            col += DEFAULT_DAYS_IN_WEEK;
+        }
+        final int row = tmpCalendar.get(Calendar.WEEK_OF_MONTH) - 1 + getOtherRowCount();
+
+        outPoint.set(col * getMeasureTileSize(), row * getActualRowHeight());
+        return outPoint;
+    }
+
+    public interface OnDrawListener {
+        void onDraw(CalendarPagerView view, CalendarDay firstDay, Canvas canvas);
     }
 }
