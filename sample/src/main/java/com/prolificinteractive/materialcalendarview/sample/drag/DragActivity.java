@@ -29,6 +29,9 @@ import static com.github.ipcjs.explorer.ExUtils.p;
  * Created by ipcjs on 2016/3/7.
  */
 public class DragActivity extends AppCompatActivity implements CompatContextInterface {
+
+    public static final int DAY_ONE_WEEK = 7;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +79,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
                 }
             }
         };
-//        materialCalendarView.addDayViewOnDrawListener(dayViewOnDrawListener);
-        materialCalendarView.setPagerOnDrawListener(new CalendarPagerView.OnDrawListener() {
+        CalendarPagerView.OnDrawListener pagerOnDrawListener = new CalendarPagerView.OnDrawListener() {
 
             private Paint paint;
 
@@ -87,7 +89,8 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
             }
 
             @Override
-            public void onDraw(CalendarPagerView view, CalendarDay firstDay, Canvas canvas) {
+            public void onDraw(CalendarPagerView view, Canvas canvas) {
+                CalendarDay firstDay = view.getFirstViewDay();
                 final int actualMaximum = firstDay.getCalendar().getActualMaximum(Calendar.DAY_OF_MONTH);
                 final int actualMinimum = firstDay.getCalendar().getActualMinimum(Calendar.DAY_OF_MONTH);
                 Point point = new Point();
@@ -95,9 +98,65 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
                     canvas.save();
                     view.getCalendarDayPoint(i, point);
                     canvas.translate(point.x, point.y);
-                    canvas.drawText("" + view.getScalePercent(), 0, view.getActualRowHeight(), paint);
+                    canvas.drawText("" + view.getScalePercent(), 0, view.getMeasuredTileSize(), paint);
                     canvas.restore();
                 }
+            }
+        };
+//        materialCalendarView.addDayViewOnDrawListener(dayViewOnDrawListener);
+//        materialCalendarView.setPagerOnDrawListener(pagerOnDrawListener);
+        materialCalendarView.setPagerOnDrawListener(new CalendarPagerView.OnDrawListener() {
+            private Calendar lastDay = Calendar.getInstance();
+            private Calendar firstDay = Calendar.getInstance();
+            private Paint paint = new Paint();
+
+            {
+                paint.setTextSize(25);
+            }
+
+            @Override
+            public void onDraw(CalendarPagerView view, Canvas canvas) {
+                view.getFirstViewDay().copyTo(firstDay);
+                view.getLastViewDay().copyTo(lastDay);
+                int first = firstDay.get(Calendar.DAY_OF_MONTH);
+                int last = lastDay.get(Calendar.DAY_OF_MONTH);
+                int itemWidth = view.getMeasuredTileSize();
+                int itemHeight = view.getActualRowHeight();
+                int firstDayOfWeek = view.getFirstDayOfWeek();
+
+                float percent = view.getScalePercent();
+                paint.setColor((paint.getColor() & 0xffffff) | (int) (percent * 255 + 0.5f) << 24);
+
+                Calendar calendar = firstDay;
+                int col = getCol(calendar, firstDayOfWeek);
+                int row = 0;
+                canvas.translate(col * itemWidth, 0);
+                int day = first;
+                while (day <= last) {
+                    // do something
+                    CalendarDay c = CalendarDay.from(calendar);
+                    canvas.drawText(c.getMonth() + "-" + c.getDay(), 0, itemWidth, paint);
+
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                    day++;
+                    col++;
+                    if (col < DAY_ONE_WEEK) {// cur week, move a item's width
+                        canvas.translate(itemWidth, 0);
+                    } else {// next week, move to next line
+                        col = 0;
+                        row++;
+                        canvas.translate(-(DAY_ONE_WEEK - 1) * itemWidth, itemHeight);
+                    }
+                }
+            }
+
+            private int getCol(Calendar day, int firstDayOfWeek) {
+                int col = day.get(Calendar.DAY_OF_WEEK) - firstDayOfWeek;
+                return col < 0 ? (col + DAY_ONE_WEEK) : col;
+            }
+
+            private int getRow(Calendar day) {
+                return day.get(Calendar.WEEK_OF_MONTH) - 1;
             }
         });
     }

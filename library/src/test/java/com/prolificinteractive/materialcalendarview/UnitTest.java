@@ -23,4 +23,13 @@ public class UnitTest {
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONTH);
         assertEquals("周一", c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()));
     }
+
+    @Test
+    public void testDayOfWeek() {
+        // 1,2,3,4,5,6,7,1,2,3,4,5,6,7,
+        // 0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+        int day = 1;
+        day -= 1;
+
+    }
 }

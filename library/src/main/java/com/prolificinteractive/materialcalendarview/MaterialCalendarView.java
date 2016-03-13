@@ -1165,7 +1165,7 @@ public class MaterialCalendarView extends ViewGroup {
     /**
      * @return The first day of the week as a {@linkplain Calendar} day constant.
      */
-    @CalendarPagerView.DayOfWeek
+    @CalendarUtils.DayOfWeek
     public int getFirstDayOfWeek() {
         return adapter.getFirstDayOfWeek();
     }
@@ -1503,7 +1503,7 @@ public class MaterialCalendarView extends ViewGroup {
         return weekCount;
     }
 
-    float getScalePercent() {
+    float compateScalePercent() {
         if (getParent() instanceof ViewGroup && ((ViewGroup) getParent()).getMeasuredHeight() != 0) {
             int maxHeight = ((ViewGroup) getParent()).getMeasuredHeight();
             int normalHeight = getMeasureNormalHeight();
@@ -1525,7 +1525,7 @@ public class MaterialCalendarView extends ViewGroup {
             selectedDay.copyTo(c);
             c.setFirstDayOfWeek(getFirstDayOfWeek());
             int weekOfMonth = c.get(Calendar.WEEK_OF_MONTH);// 选中的行, 属于本月的第几周
-            int bottom = (int) ((weekOfMonth + weekDayViewRowCount - 1) * pagerView.getActualRowHeight() + pagerView.getMeasureTileSize() + 0.5f);
+            int bottom = (int) ((weekOfMonth + weekDayViewRowCount - 1) * pagerView.getActualRowHeight() + pagerView.getMeasuredTileSize() + 0.5f);
             return bottom + topbarRowCount * measureTileSize;
         }
         return getMeasuredHeight();

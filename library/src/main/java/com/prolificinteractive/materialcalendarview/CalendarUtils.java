@@ -1,8 +1,11 @@
 package com.prolificinteractive.materialcalendarview;
 
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -74,6 +77,18 @@ public class CalendarUtils {
         return cal.get(Calendar.WEEK_OF_MONTH);
     }
 
+    public static CalendarDay getLastDayOfMonth(CalendarDay day) {
+        Calendar calendar = day.copyTo(Calendar.getInstance());
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return CalendarDay.from(calendar);
+    }
+
+    public static CalendarDay getLastDayOfWeek(CalendarDay day) {
+        Calendar calendar = day.copyTo(Calendar.getInstance());
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getActualMaximum(Calendar.DAY_OF_WEEK));
+        return CalendarDay.from(calendar);
+    }
+
     public static int getYear(Calendar calendar) {
         return calendar.get(YEAR);
     }
@@ -88,5 +103,17 @@ public class CalendarUtils {
 
     public static int getDayOfWeek(Calendar calendar) {
         return calendar.get(DAY_OF_WEEK);
+    }
+
+    @IntDef({Calendar.SUNDAY,
+            Calendar.MONDAY,
+            Calendar.TUESDAY,
+            Calendar.WEDNESDAY,
+            Calendar.THURSDAY,
+            Calendar.FRIDAY,
+            Calendar.SATURDAY,
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    @interface DayOfWeek {
     }
 }
