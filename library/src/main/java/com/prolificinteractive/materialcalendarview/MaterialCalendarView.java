@@ -434,9 +434,10 @@ public class MaterialCalendarView extends ViewGroup {
                 this.selectionMode = SELECTION_MODE_SINGLE;
                 if (oldMode == SELECTION_MODE_MULTIPLE) {
                     //We should only have one selection now, so we should pick one
-                    List<CalendarDay> dates = getSelectedDates();
-                    if (!dates.isEmpty()) {
-                        setSelectedDate(getSelectedDate());
+                    final CalendarDay selectedDate = getSelectedDate();
+                    if (selectedDate != null) {
+                        clearSelection();
+                        setDateSelectedAndCallback(selectedDate, true);
                     }
                 }
             }
@@ -709,10 +710,6 @@ public class MaterialCalendarView extends ViewGroup {
         return adapter.getSelectedDates();
     }
 
-    private void clearSelection() {
-        adapter.clearSelections();
-    }
-
     /**
      * Clear the currently selected date(s)
      */
@@ -724,17 +721,24 @@ public class MaterialCalendarView extends ViewGroup {
         }
     }
 
+    public void clearSelection() {
+        adapter.clearSelections();
+    }
+
     public void setDateSelectedAndCallback(@NonNull CalendarDay date, boolean selected) {
         adapter.setDateSelected(date, selected);
         dispatchOnDateSelected(date, selected);
     }
 
     /**
-     * @param calendar a Calendar set to a day to select. Null to clear selection
+     * @param day      a CalendarDay to change. Passing null does nothing
+     * @param selected true if day should be selected, false to deselect
      */
-    @Deprecated
-    public void setSelectedDate(@Nullable Calendar calendar) {
-        setSelectedDate(CalendarDay.from(calendar));
+    public void setDateSelected(@Nullable CalendarDay day, boolean selected) {
+        if (day == null) {
+            return;
+        }
+        adapter.setDateSelected(day, selected);
     }
 
     /**
@@ -760,7 +764,6 @@ public class MaterialCalendarView extends ViewGroup {
      * @param calendar a Calendar to change. Passing null does nothing
      * @param selected true if day should be selected, false to deselect
      */
-    @Deprecated
     public void setDateSelected(@Nullable Calendar calendar, boolean selected) {
         setDateSelected(CalendarDay.from(calendar), selected);
     }
@@ -769,21 +772,8 @@ public class MaterialCalendarView extends ViewGroup {
      * @param date     a Date to change. Passing null does nothing
      * @param selected true if day should be selected, false to deselect
      */
-    @Deprecated
     public void setDateSelected(@Nullable Date date, boolean selected) {
         setDateSelected(CalendarDay.from(date), selected);
-    }
-
-    /**
-     * @param day      a CalendarDay to change. Passing null does nothing
-     * @param selected true if day should be selected, false to deselect
-     */
-    @Deprecated
-    public void setDateSelected(@Nullable CalendarDay day, boolean selected) {
-        if (day == null) {
-            return;
-        }
-        adapter.setDateSelected(day, selected);
     }
 
     /**
