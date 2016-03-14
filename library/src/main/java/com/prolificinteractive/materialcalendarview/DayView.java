@@ -181,41 +181,8 @@ public class DayView extends CheckedTextView {
         if (selectionDrawable != null) {
             setBackgroundDrawable(selectionDrawable);
         } else {
-            setBackgroundDrawable(generateBackground(selectionColor, fadeTime));
+            setBackgroundDrawable(DrawableUtil.generateBackground(selectionColor, fadeTime));
         }
-    }
-
-    private static Drawable generateBackground(int color, int fadeTime) {
-        StateListDrawable drawable = new StateListDrawable();
-        drawable.setExitFadeDuration(fadeTime);
-        drawable.addState(new int[]{android.R.attr.state_checked}, generateCircleDrawable(color));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            drawable.addState(new int[]{android.R.attr.state_pressed}, generateRippleDrawable(color));
-        } else {
-            drawable.addState(new int[]{android.R.attr.state_pressed}, generateCircleDrawable(color));
-        }
-
-        drawable.addState(new int[]{}, generateCircleDrawable(Color.TRANSPARENT));
-
-        return drawable;
-    }
-
-    private static Drawable generateCircleDrawable(final int color) {
-        ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
-        drawable.setShaderFactory(new ShapeDrawable.ShaderFactory() {
-            @Override
-            public Shader resize(int width, int height) {
-                return new LinearGradient(0, 0, 0, 0, color, color, Shader.TileMode.REPEAT);
-            }
-        });
-        return drawable;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private static Drawable generateRippleDrawable(final int color) {
-        ColorStateList list = ColorStateList.valueOf(color);
-        Drawable mask = generateCircleDrawable(Color.WHITE);
-        return new RippleDrawable(list, null, mask);
     }
 
     /**
@@ -249,5 +216,54 @@ public class DayView extends CheckedTextView {
      */
     public interface DecorateListener {
         void decorate(DayView view);
+    }
+
+    /**
+     * Created by JiangSong on 2016/3/14.
+     */
+    private static class DrawableUtil {
+        private static int sBackgroundColor;
+        private static int sBackgroundFadeTime;
+        private static Drawable.ConstantState sBackgroundState;
+
+        public static Drawable generateBackground(int color, int fadeTime) {
+            StateListDrawable drawable;
+            if (sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
+                drawable = new StateListDrawable();
+                drawable.setExitFadeDuration(fadeTime);
+                drawable.addState(new int[]{android.R.attr.state_checked}, generateCircleDrawable(color));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    drawable.addState(new int[]{android.R.attr.state_pressed}, generateRippleDrawable(color));
+                } else {
+                    drawable.addState(new int[]{android.R.attr.state_pressed}, generateCircleDrawable(color));
+                }
+
+                drawable.addState(new int[]{}, generateCircleDrawable(Color.TRANSPARENT));
+                sBackgroundState = drawable.getConstantState();
+                sBackgroundColor = color;
+                sBackgroundFadeTime = fadeTime;
+            } else {
+                drawable = (StateListDrawable) sBackgroundState.newDrawable();
+            }
+            return drawable;
+        }
+
+        private static Drawable generateCircleDrawable(final int color) {
+            ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+            drawable.setShaderFactory(new ShapeDrawable.ShaderFactory() {
+                @Override
+                public Shader resize(int width, int height) {
+                    return new LinearGradient(0, 0, 0, 0, color, color, Shader.TileMode.REPEAT);
+                }
+            });
+            return drawable;
+        }
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        private static Drawable generateRippleDrawable(final int color) {
+            ColorStateList list = ColorStateList.valueOf(color);
+            Drawable mask = generateCircleDrawable(Color.WHITE);
+            return new RippleDrawable(list, null, mask);
+        }
     }
 }
