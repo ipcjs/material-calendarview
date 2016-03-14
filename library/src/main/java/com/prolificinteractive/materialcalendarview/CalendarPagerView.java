@@ -458,7 +458,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
     public interface OnDrawListener {
         /**
-         * @param view   current drawing view
+         * @param cpv   current drawing view
          * @param canvas current canvas
          * @see #getMeasuredTileSize()
          * @see #getActualRowHeight()
@@ -466,6 +466,65 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
          * @see #getFirstViewDay()
          * @see #getFirstDayOfWeek()
          */
-        void onDraw(CalendarPagerView view, Canvas canvas);
+        void onDraw(CalendarPagerView cpv, Canvas canvas);
+
+        /**
+         * simple
+         */
+        abstract class Simple implements OnDrawListener {
+            private Calendar lastDay = Calendar.getInstance();
+            private Calendar firstDay = Calendar.getInstance();
+
+            @Override
+            public void onDraw(CalendarPagerView cpv, Canvas canvas) {
+                cpv.getFirstViewDay().copyTo(firstDay);
+                cpv.getLastViewDay().copyTo(lastDay);
+                int first = firstDay.get(Calendar.DAY_OF_MONTH);
+                int last = lastDay.get(Calendar.DAY_OF_MONTH);
+                int itemWidth = cpv.getMeasuredTileSize();
+                int itemHeight = cpv.getActualRowHeight();
+                int firstDayOfWeek = cpv.getFirstDayOfWeek();
+                float percent = cpv.getScalePercent();
+
+                Calendar calendar = firstDay;
+                int col = getCol(calendar, firstDayOfWeek);
+                int row = 0;
+                canvas.translate(col * itemWidth, 0);
+                int day = first;
+                while (day <= last) {
+                    // do something
+                    CalendarDay c = CalendarDay.from(calendar);
+                    onDrawItem(cpv, c, canvas, percent, itemWidth, itemHeight);
+
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                    day++;
+                    col++;
+                    if (col < DEFAULT_DAYS_IN_WEEK) {// cur week, move a item's width
+                        canvas.translate(itemWidth, 0);
+                    } else {// next week, move to next line
+                        col = 0;
+                        row++;
+                        canvas.translate(-(DEFAULT_DAYS_IN_WEEK - 1) * itemWidth, itemHeight);
+                    }
+                }
+            }
+
+            protected abstract void onDrawItem(
+                    CalendarPagerView cpv,
+                    CalendarDay day,
+                    Canvas canvas,
+                    float percent,
+                    int itemWidth, int itemHeight
+            );
+
+            protected int getCol(Calendar day, int firstDayOfWeek) {
+                int col = day.get(DAY_OF_WEEK) - firstDayOfWeek;
+                return col < 0 ? (col + DEFAULT_DAYS_IN_WEEK) : col;
+            }
+
+            protected int getRow(Calendar day) {
+                return day.get(Calendar.WEEK_OF_MONTH) - 1;
+            }
+        }
     }
 }

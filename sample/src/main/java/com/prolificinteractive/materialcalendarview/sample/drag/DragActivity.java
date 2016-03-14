@@ -105,9 +105,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
         };
 //        materialCalendarView.addDayViewOnDrawListener(dayViewOnDrawListener);
 //        materialCalendarView.setPagerOnDrawListener(pagerOnDrawListener);
-        materialCalendarView.setPagerOnDrawListener(new CalendarPagerView.OnDrawListener() {
-            private Calendar lastDay = Calendar.getInstance();
-            private Calendar firstDay = Calendar.getInstance();
+        materialCalendarView.setPagerOnDrawListener(new CalendarPagerView.OnDrawListener.Simple() {
             private Paint paint = new Paint();
 
             {
@@ -115,48 +113,9 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
             }
 
             @Override
-            public void onDraw(CalendarPagerView view, Canvas canvas) {
-                view.getFirstViewDay().copyTo(firstDay);
-                view.getLastViewDay().copyTo(lastDay);
-                int first = firstDay.get(Calendar.DAY_OF_MONTH);
-                int last = lastDay.get(Calendar.DAY_OF_MONTH);
-                int itemWidth = view.getMeasuredTileSize();
-                int itemHeight = view.getActualRowHeight();
-                int firstDayOfWeek = view.getFirstDayOfWeek();
-
-                float percent = view.getScalePercent();
+            protected void onDrawItem(CalendarPagerView cpv, CalendarDay day, Canvas canvas, float percent, int itemWidth, int itemHeight) {
                 paint.setColor((paint.getColor() & 0xffffff) | (int) (percent * 255 + 0.5f) << 24);
-
-                Calendar calendar = firstDay;
-                int col = getCol(calendar, firstDayOfWeek);
-                int row = 0;
-                canvas.translate(col * itemWidth, 0);
-                int day = first;
-                while (day <= last) {
-                    // do something
-                    CalendarDay c = CalendarDay.from(calendar);
-                    canvas.drawText(c.getMonth() + "-" + c.getDay(), 0, itemWidth, paint);
-
-                    calendar.add(Calendar.DAY_OF_MONTH, 1);
-                    day++;
-                    col++;
-                    if (col < DAY_ONE_WEEK) {// cur week, move a item's width
-                        canvas.translate(itemWidth, 0);
-                    } else {// next week, move to next line
-                        col = 0;
-                        row++;
-                        canvas.translate(-(DAY_ONE_WEEK - 1) * itemWidth, itemHeight);
-                    }
-                }
-            }
-
-            private int getCol(Calendar day, int firstDayOfWeek) {
-                int col = day.get(Calendar.DAY_OF_WEEK) - firstDayOfWeek;
-                return col < 0 ? (col + DAY_ONE_WEEK) : col;
-            }
-
-            private int getRow(Calendar day) {
-                return day.get(Calendar.WEEK_OF_MONTH) - 1;
+                canvas.drawText(day.getMonth() + "-" + day.getDay(), 0, itemWidth, paint);
             }
         });
     }
