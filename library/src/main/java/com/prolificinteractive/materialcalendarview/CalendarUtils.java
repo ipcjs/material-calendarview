@@ -83,9 +83,11 @@ public class CalendarUtils {
         return CalendarDay.from(calendar);
     }
 
-    public static CalendarDay getLastDayOfWeek(CalendarDay day) {
+    public static CalendarDay getLastDayOfWeek(CalendarDay day, int firstDayOfWeek) {
         Calendar calendar = day.copyTo(Calendar.getInstance());
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.getActualMaximum(Calendar.DAY_OF_WEEK));
+        calendar.getTimeInMillis();// to computeTime
+        calendar.setFirstDayOfWeek(firstDayOfWeek);
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getActualMaximum(DAY_OF_WEEK));
         return CalendarDay.from(calendar);
     }
 

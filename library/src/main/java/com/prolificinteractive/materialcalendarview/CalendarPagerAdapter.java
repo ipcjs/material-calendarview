@@ -1,7 +1,9 @@
 package com.prolificinteractive.materialcalendarview;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pools;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -133,9 +135,14 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         return index;
     }
 
+    private Pools.SimplePool<V> pagerPool = new Pools.SimplePool<>(5);
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        V pagerView = createView(position);
+        V pagerView = pagerPool.acquire();
+        // todo pool
+        if (pagerView == null) {
+            pagerView = createView(position);
+        }
         pagerView.setAlpha(0);
         pagerView.setSelectionEnabled(selectionEnabled);
 
@@ -164,8 +171,17 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
                 listener.decorate(view);
             }
         }
-
         return pagerView;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        V pagerView = (V) object;
+        currentViews.remove(pagerView);
+        container.removeView(pagerView);
+        if (pagerPool.release(pagerView)) {
+            Log.e(getClass().getSimpleName(), "recycle to pool fail, pool's size is to small");
+        }
     }
 
     public void setFirstDayOfWeek(int day) {
@@ -182,12 +198,6 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         }
     }
 
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        CalendarPagerView pagerView = (CalendarPagerView) object;
-        currentViews.remove(pagerView);
-        container.removeView(pagerView);
-    }
 
     private CalendarPagerView primaryItem;
 

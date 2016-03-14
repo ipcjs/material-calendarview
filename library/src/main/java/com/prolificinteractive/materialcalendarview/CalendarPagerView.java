@@ -23,8 +23,7 @@ import static java.util.Calendar.DATE;
 import static java.util.Calendar.DAY_OF_WEEK;
 
 public abstract class CalendarPagerView extends ViewGroup implements View.OnClickListener {
-
-    protected static final int DEFAULT_DAYS_IN_WEEK = 7;
+    public static final int DEFAULT_DAYS_IN_WEEK = 7;
     private static final Calendar tmpCalendar = CalendarUtils.getInstance();
     private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
     private final List<DayView> dayViews = new ArrayList<>();
@@ -56,8 +55,8 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         setClipChildren(false);
         setClipToPadding(false);
 
-        buildWeekDays(getFirstDayOfGrid());
-        buildDayViews(getFirstDayOfGrid());
+        addWeekDays(getFirstDayOfGrid());
+        addDayViews(getFirstDayOfGrid());
         addView(drawView);
     }
 
@@ -93,7 +92,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
     protected abstract int getActualWeekCount();
 
-    private void buildWeekDays(Calendar calendar) {
+    private void addWeekDays(Calendar calendar) {
         for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
             WeekDayView weekDayView = new WeekDayView(getContext(), CalendarUtils.getDayOfWeek(calendar));
             weekDayViews.add(weekDayView);
@@ -102,7 +101,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         }
     }
 
-    protected void buildDayViews(Calendar calendar) {
+    protected void addDayViews(Calendar calendar) {
         for (int r = 0; r < getAddedWeekCount(); r++) {
             for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
                 CalendarDay day = CalendarDay.from(calendar);
@@ -141,16 +140,25 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     }
 
     public void setFirstDayOfWeek(int dayOfWeek) {
-        this.firstDayOfWeek = dayOfWeek;
+        if (firstDayOfWeek != dayOfWeek) {
+            this.firstDayOfWeek = dayOfWeek;
+            updateTimeRange();
+        }
+    }
 
-        Calendar calendar = getFirstDayOfGrid();
-        calendar.set(DAY_OF_WEEK, dayOfWeek);
+    private void updateTimeRange() {
+        // todo init
+        final int firstDayOfWeek = getFirstDayOfWeek();
+        final Calendar firstDayOfGrid = getFirstDayOfGrid();
+
+        Calendar calendar = (Calendar) firstDayOfGrid.clone();
+        calendar.set(DAY_OF_WEEK, firstDayOfWeek);
         for (WeekDayView dayView : weekDayViews) {
             dayView.setDayOfWeek(calendar);
             calendar.add(DATE, 1);
         }
 
-        calendar = getFirstDayOfGrid();
+        calendar = (Calendar) firstDayOfGrid.clone();
         for (DayView dayView : dayViews) {
             CalendarDay day = CalendarDay.from(calendar);
             dayView.setDay(day);
@@ -437,6 +445,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
          * simple
          */
         abstract class Simple implements OnDrawListener {
+            public static final long ONE_DAY = 24L * 60 * 60 * 1000;
             private Calendar lastDay = Calendar.getInstance();
             private Calendar firstDay = Calendar.getInstance();
 
@@ -445,7 +454,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
                 cpv.getFirstViewDay().copyTo(firstDay);
                 cpv.getLastViewDay().copyTo(lastDay);
                 int first = firstDay.get(Calendar.DAY_OF_MONTH);
-                int last = lastDay.get(Calendar.DAY_OF_MONTH);
+                int last = first + (int) ((lastDay.getTimeInMillis() - firstDay.getTimeInMillis()) / ONE_DAY);
                 int itemWidth = cpv.getMeasuredTileSize();
                 int itemHeight = cpv.getActualRowHeight();
                 int firstDayOfWeek = cpv.getFirstDayOfWeek();

@@ -10,12 +10,10 @@ import android.support.annotation.NonNull;
 @SuppressLint("ViewConstructor")
 public class WeekView extends CalendarPagerView {
 
-    private static final int DEFAULT_DAYS_IN_WEEK = 7;
-
     public WeekView(@NonNull MaterialCalendarView view,
                     CalendarDay firstViewDay,
                     int firstDayOfWeek) {
-        super(view, firstViewDay, CalendarUtils.getLastDayOfWeek(firstViewDay), firstDayOfWeek);
+        super(view, firstViewDay, CalendarUtils.getLastDayOfWeek(firstViewDay, firstDayOfWeek), firstDayOfWeek);
     }
 
     @Override
