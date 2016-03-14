@@ -1,9 +1,7 @@
 package com.prolificinteractive.materialcalendarview;
 
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -306,18 +304,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
     private void measure(boolean isDayView, List<? extends View> views, int space, float scalePercent) {
         for (View view : views) {
-            if (isDayView) {
-                boolean shouldReDraw = false;
-                for (DayView.OnDrawListener listener : mcv.getDayViewOnDrawListeners()) {
-                    if (listener.shouldReDraw((DayView) view)) {
-                        shouldReDraw = true;
-                        break;
-                    }
-                }
-                if (shouldReDraw) {
-                    ViewCompat.postInvalidateOnAnimation(view);
-                }
-            }
             LayoutParams params = (LayoutParams) view.getLayoutParams();
             params.scalePercent = scalePercent;
             params.remainingSpaceOfRow = space;
@@ -433,27 +419,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         public LayoutParams() {
             super(WRAP_CONTENT, WRAP_CONTENT);
         }
-    }
-
-    @Deprecated
-    public Point getCalendarDayPoint(int day, Point outPoint) {
-        return getCalendarDayPoint(CalendarDay.from(getFirstViewDay().getYear(), getFirstViewDay().getMonth(), day), outPoint);
-    }
-
-    @Deprecated
-    public Point getCalendarDayPoint(CalendarDay day, Point outPoint) {
-        day.copyTo(tmpCalendar);
-        final int firstDayOfWeek = getFirstDayOfWeek();
-        tmpCalendar.setFirstDayOfWeek(firstDayOfWeek);
-        final int dayOfWeek = tmpCalendar.get(DAY_OF_WEEK);
-        int col = dayOfWeek - firstDayOfWeek;
-        if (col < 0) {
-            col += DEFAULT_DAYS_IN_WEEK;
-        }
-        final int row = tmpCalendar.get(Calendar.WEEK_OF_MONTH) - 1 + getOtherRowCount();
-
-        outPoint.set(col * getMeasuredTileSize(), row * getActualRowHeight());
-        return outPoint;
     }
 
     public interface OnDrawListener {

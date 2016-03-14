@@ -187,7 +187,6 @@ public class MaterialCalendarView extends ViewGroup {
 
     private final ArrayList<DayViewDecorator> dayViewDecorators = new ArrayList<>();
     private final List<DayView.DecorateListener> dayViewDecorateListeners = new ArrayList<>();
-    private final List<DayView.OnDrawListener> dayViewOnDrawListeners = new ArrayList<>();
     private boolean autoSelectOnSingleMode = false;
     private CalendarPagerView.OnDrawListener pagerOnDrawListener;
 
@@ -1221,16 +1220,8 @@ public class MaterialCalendarView extends ViewGroup {
         refreshCurrentDayViews();
     }
 
-    public void addDayViewOnDrawListener(DayView.OnDrawListener listener) {
-        dayViewOnDrawListeners.add(listener);
-    }
-
     List<DayView.DecorateListener> getDayViewDecorateListeners() {
         return dayViewDecorateListeners;
-    }
-
-    List<DayView.OnDrawListener> getDayViewOnDrawListeners() {
-        return dayViewOnDrawListeners;
     }
 
     public void setPagerOnDrawListener(CalendarPagerView.OnDrawListener pagerOnDrawListener) {

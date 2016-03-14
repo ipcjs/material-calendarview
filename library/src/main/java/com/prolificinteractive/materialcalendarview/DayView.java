@@ -175,9 +175,6 @@ public class DayView extends CheckedTextView {
             customBackground.draw(canvas);
         }
         super.onDraw(canvas);
-        for (OnDrawListener listener : mcv.getDayViewOnDrawListeners()) {
-            listener.onDraw(this, canvas);
-        }
     }
 
     private void regenerateBackground() {
@@ -252,16 +249,5 @@ public class DayView extends CheckedTextView {
      */
     public interface DecorateListener {
         void decorate(DayView view);
-    }
-
-    public interface OnDrawListener {
-        /**
-         * 该方法只是用来优化重绘时的性能, 返回false, onDraw也可能被调用~~;
-         * @param view
-         * @return true, DayView的Parent大小改变时, 重绘DayView;
-         */
-        boolean shouldReDraw(DayView view);
-
-        void onDraw(DayView view, Canvas canvas);
     }
 }
