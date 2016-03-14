@@ -1084,7 +1084,7 @@ public class MaterialCalendarView extends ViewGroup {
         int tileSizePx = -1;
         boolean topbarVisible = true;
         int selectionMode = SELECTION_MODE_SINGLE;
-        //        boolean dynamicHeightEnabled = false;
+//        boolean dynamicHeightEnabled = false;
         int layoutMode;
 
         SavedState(Parcelable superState) {
