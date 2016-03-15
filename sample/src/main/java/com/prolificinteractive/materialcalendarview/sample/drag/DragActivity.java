@@ -77,10 +77,6 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
         });
     }
 
-    private static int setAlpha(int color, float alpha) {
-        return (color & 0xffffff) | ((int) (alpha * 255 + 0.5) << 24);
-    }
-
     @Override
     public Context getContext() {
         return this;

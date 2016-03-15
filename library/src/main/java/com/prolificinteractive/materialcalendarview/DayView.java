@@ -4,11 +4,10 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Rect;
-import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -172,6 +171,7 @@ public class DayView extends CheckedTextView {
             customBackground.setState(getDrawableState());
             customBackground.draw(canvas);
         }
+//        Log.d(getClass().getSimpleName(), getDate() + ", " + isChecked());
         super.onDraw(canvas);
     }
 
@@ -179,7 +179,7 @@ public class DayView extends CheckedTextView {
         if (selectionDrawable != null) {
             setBackgroundDrawable(selectionDrawable);
         } else {
-            setBackgroundDrawable(DrawableUtil.generateBackground(selectionColor, fadeTime));
+            setBackgroundDrawable(DrawableUtil.generateBackground(getResources(), selectionColor, fadeTime));
         }
     }
 
@@ -224,37 +224,29 @@ public class DayView extends CheckedTextView {
         private static int sBackgroundFadeTime;
         private static Drawable.ConstantState sBackgroundState;
 
-        public static Drawable generateBackground(int color, int fadeTime) {
+        public static Drawable generateBackground(Resources r, int color, int fadeTime) {
             StateListDrawable drawable;
             if (true // cache stateListDrawable have some problem when child Drawable is rippleDrawable...
                     || sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
                 drawable = new StateListDrawable();
                 drawable.setExitFadeDuration(fadeTime);
                 drawable.addState(new int[]{android.R.attr.state_checked}, generateCircleDrawable(color));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    drawable.addState(new int[]{android.R.attr.state_pressed}, generateRippleDrawable(color));
-                } else {
-                    drawable.addState(new int[]{android.R.attr.state_pressed}, generateCircleDrawable(color));
-                }
-
+                drawable.addState(new int[]{android.R.attr.state_pressed}, Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                        ? generateRippleDrawable(color)
+                        : generateCircleDrawable(color));
                 drawable.addState(new int[]{}, generateCircleDrawable(Color.TRANSPARENT));
                 sBackgroundState = drawable.getConstantState();
                 sBackgroundColor = color;
                 sBackgroundFadeTime = fadeTime;
             } else {
-                drawable = (StateListDrawable) sBackgroundState.newDrawable();
+                drawable = (StateListDrawable) sBackgroundState.newDrawable(r);
             }
             return drawable;
         }
 
         private static Drawable generateCircleDrawable(final int color) {
             ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
-            drawable.setShaderFactory(new ShapeDrawable.ShaderFactory() {
-                @Override
-                public Shader resize(int width, int height) {
-                    return new LinearGradient(0, 0, 0, 0, color, color, Shader.TileMode.REPEAT);
-                }
-            });
+            drawable.getPaint().setColor(color);
             return drawable;
         }
 

@@ -1495,7 +1495,7 @@ public class MaterialCalendarView extends ViewGroup {
         return weekCount;
     }
 
-    float compateScalePercent() {
+    float computeScalePercent() {
         if (getParent() instanceof ViewGroup && ((ViewGroup) getParent()).getMeasuredHeight() != 0) {
             int maxHeight = ((ViewGroup) getParent()).getMeasuredHeight();
             int normalHeight = getMeasureNormalHeight();

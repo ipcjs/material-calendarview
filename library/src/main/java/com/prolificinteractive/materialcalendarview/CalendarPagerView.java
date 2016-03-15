@@ -322,26 +322,22 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         //Just use the spec sizes
         setMeasuredDimension(specWidthSize, specHeightSize);
 
-        int spaceOfRow = 0;
         scalePercent = 0;
+        actualRowHeight = measuredTileSize;
         if (mcv.isVerticalSplit()) {
             int actualTileRowCount = getActualWeekCount() + getOtherRowCount();
             actualRowHeight = getMeasuredHeight() / actualTileRowCount;
-            spaceOfRow = actualRowHeight - measuredTileSize;
-            scalePercent = mcv.compateScalePercent();
+            scalePercent = mcv.computeScalePercent();
         }
 
         if (mcv.isShowWeekDayView()) {
-            measure(false, weekDayViews, spaceOfRow, scalePercent);
+            measure(false, weekDayViews);
         }
-        measure(true, dayViews, spaceOfRow, scalePercent);
+        measure(true, dayViews);
     }
 
-    private void measure(boolean isDayView, List<? extends View> views, int space, float scalePercent) {
+    private void measure(boolean isDayView, List<? extends View> views) {
         for (View view : views) {
-            LayoutParams params = (LayoutParams) view.getLayoutParams();
-            params.scalePercent = scalePercent;
-            params.remainingSpaceOfRow = space;
             int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
                     measuredTileSize,
                     MeasureSpec.EXACTLY
@@ -361,7 +357,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         final int parentLeft = 0;
-
         int childTop = 0;
         if (mcv.isShowWeekDayView()) {
             childTop = layout(weekDayViews, parentLeft, parentLeft, childTop);
@@ -372,11 +367,8 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     }
 
     private int layout(List<? extends View> views, int parentLeft, int childLeft, int top) {
-        int space;
         for (int i = 0; i < views.size(); i++) {
             final View child = views.get(i);
-            LayoutParams params = (LayoutParams) child.getLayoutParams();
-            space = params.remainingSpaceOfRow;
 
             final int width = child.getMeasuredWidth();
             final int height = child.getMeasuredHeight();
@@ -388,7 +380,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
             //We should warp every so many children
             if (i % DEFAULT_DAYS_IN_WEEK == (DEFAULT_DAYS_IN_WEEK - 1)) {
                 childLeft = parentLeft;
-                top += height + space;
+                top += actualRowHeight;
             }
         }
         return top;
@@ -445,9 +437,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
      * Simple layout params class for MonthView, since every child is the same size
      */
     public static class LayoutParams extends MarginLayoutParams {
-        public int remainingSpaceOfRow;
-        public float scalePercent;
-
         /**
          * {@inheritDoc}
          */
