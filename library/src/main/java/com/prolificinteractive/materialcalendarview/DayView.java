@@ -51,7 +51,7 @@ public class DayView extends CheckedTextView {
     private int showOtherDates = MaterialCalendarView.SHOW_DEFAULTS;
     private MaterialCalendarView mcv;
 
-    public DayView(Context context, CalendarDay day, MaterialCalendarView mcv) {
+    public DayView(Context context, MaterialCalendarView mcv) {
         super(context);
         this.mcv = mcv;
 
@@ -64,10 +64,11 @@ public class DayView extends CheckedTextView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             setTextAlignment(TEXT_ALIGNMENT_CENTER);
         }
-
-        setDay(day);
     }
 
+    void setDayInternal(CalendarDay date) {
+        this.date = date;
+    }
     public void setDay(CalendarDay date) {
         this.date = date;
         setText(getLabel());

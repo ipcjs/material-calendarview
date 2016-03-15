@@ -19,7 +19,7 @@ class WeekDayView extends TextView {
     private WeekDayFormatter formatter = WeekDayFormatter.DEFAULT;
     private int dayOfWeek;
 
-    public WeekDayView(Context context, int dayOfWeek) {
+    public WeekDayView(Context context) {
         super(context);
 
         setGravity(Gravity.CENTER);
@@ -27,8 +27,6 @@ class WeekDayView extends TextView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             setTextAlignment(TEXT_ALIGNMENT_CENTER);
         }
-
-        setDayOfWeek(dayOfWeek);
     }
 
     public void setWeekDayFormatter(WeekDayFormatter formatter) {

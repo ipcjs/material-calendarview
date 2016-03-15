@@ -1,6 +1,7 @@
 package com.prolificinteractive.materialcalendarview;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 /**
@@ -9,16 +10,18 @@ import android.support.annotation.NonNull;
  */
 @SuppressLint("ViewConstructor")
 public class WeekView extends CalendarPagerView {
-
-    public WeekView(@NonNull MaterialCalendarView view,
-                    CalendarDay firstViewDay,
-                    int firstDayOfWeek) {
-        super(view, firstViewDay, CalendarUtils.getLastDayOfWeek(firstViewDay, firstDayOfWeek), firstDayOfWeek);
+    public WeekView(Context context, @NonNull MaterialCalendarView mcv) {
+        super(context, mcv);
     }
 
     @Override
     protected int getActualWeekCount() {
         return 1;
+    }
+
+    @Override
+    protected CalendarDay computeLastViewDay() {
+        return CalendarUtils.getLastDayOfWeek(getFirstViewDay(), getFirstDayOfWeek());
     }
 
     @Override

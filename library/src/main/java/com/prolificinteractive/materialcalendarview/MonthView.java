@@ -1,6 +1,7 @@
 package com.prolificinteractive.materialcalendarview;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.Calendar;
@@ -25,8 +26,13 @@ class MonthView extends CalendarPagerView {
         return DEFAULT_MAX_WEEKS;
     }
 
-    public MonthView(@NonNull MaterialCalendarView view, CalendarDay month, int firstDayOfWeek) {
-        super(view, month, CalendarUtils.getLastDayOfMonth(month), firstDayOfWeek);
+    public MonthView(Context context, @NonNull MaterialCalendarView mcv) {
+        super(context, mcv);
+    }
+
+    @Override
+    protected CalendarDay computeLastViewDay() {
+        return CalendarUtils.getLastDayOfMonth(getFirstViewDay());
     }
 
     public CalendarDay getMonth() {

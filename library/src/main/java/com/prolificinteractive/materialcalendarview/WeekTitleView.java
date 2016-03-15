@@ -41,7 +41,8 @@ public class WeekTitleView extends ViewGroup {
         for (int i = 0; i < size; i++) {
             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
             if (needCreate) {
-                WeekDayView week = new WeekDayView(getContext(), dayOfWeek);
+                WeekDayView week = new WeekDayView(getContext());
+                week.setDayOfWeek(dayOfWeek);
                 addView(week);
                 weekDayViews.add(week);
             } else {

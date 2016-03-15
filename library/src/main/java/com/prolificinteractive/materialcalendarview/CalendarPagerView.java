@@ -1,5 +1,6 @@
 package com.prolificinteractive.materialcalendarview;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -17,7 +18,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
-import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_DEFAULTS;
+import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_NONE;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.showOtherMonths;
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.DAY_OF_WEEK;
@@ -30,7 +31,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<>();
     private final DrawView drawView;
     @ShowOtherDates
-    protected int showOtherDates = SHOW_DEFAULTS;
+    protected int showOtherDates = SHOW_NONE;
     private MaterialCalendarView mcv;
     private CalendarDay firstViewDay;
     private CalendarDay lastViewDay;
@@ -41,22 +42,16 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     private float scalePercent;
     private int actualRowHeight;
 
-    public CalendarPagerView(@NonNull MaterialCalendarView view,
-                             CalendarDay firstViewDay,
-                             CalendarDay lastViewDay,
-                             int firstDayOfWeek) {
-        super(view.getContext());
-        this.mcv = view;
+    public CalendarPagerView(Context context, @NonNull MaterialCalendarView mcv) {
+        super(context);
+        this.mcv = mcv;
         this.drawView = new DrawView(getContext(), mcv, this);
-        this.firstViewDay = firstViewDay;
-        this.lastViewDay = lastViewDay;
-        this.firstDayOfWeek = firstDayOfWeek;
 
         setClipChildren(false);
         setClipToPadding(false);
 
-        addWeekDays(getFirstDayOfGrid());
-        addDayViews(getFirstDayOfGrid());
+        addWeekDays();
+        addDayViews();
         addView(drawView);
     }
 
@@ -69,9 +64,13 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     }
 
     public CalendarDay getLastViewDay() {
+        if (lastViewDay == null) {
+            lastViewDay = computeLastViewDay();
+        }
         return lastViewDay;
     }
 
+    protected abstract CalendarDay computeLastViewDay();
     public int getActualRowHeight() {
         return actualRowHeight;
     }
@@ -92,25 +91,21 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
     protected abstract int getActualWeekCount();
 
-    private void addWeekDays(Calendar calendar) {
+    private void addWeekDays() {
         for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
-            WeekDayView weekDayView = new WeekDayView(getContext(), CalendarUtils.getDayOfWeek(calendar));
+            WeekDayView weekDayView = new WeekDayView(getContext());
             weekDayViews.add(weekDayView);
             addView(weekDayView);
-            calendar.add(DATE, 1);
         }
     }
 
-    protected void addDayViews(Calendar calendar) {
+    protected void addDayViews() {
         for (int r = 0; r < getAddedWeekCount(); r++) {
             for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
-                CalendarDay day = CalendarDay.from(calendar);
-                DayView dayView = new DayView(getContext(), day, mcv);
+                DayView dayView = new DayView(getContext(), mcv);
                 dayView.setOnClickListener(this);
                 dayViews.add(dayView);
                 addView(dayView);
-
-                calendar.add(DATE, 1);
             }
         }
     }
@@ -139,33 +134,65 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         return firstDayOfWeek;
     }
 
-    public void setFirstDayOfWeek(int dayOfWeek) {
-        if (firstDayOfWeek != dayOfWeek) {
-            this.firstDayOfWeek = dayOfWeek;
-            updateTimeRange();
+    public void setDate(CalendarDay firstViewDay, int firstDayOfWeek) {
+        if (!firstViewDay.equals(this.firstViewDay) || firstDayOfWeek != this.firstDayOfWeek) {
+            this.firstViewDay = firstViewDay;
+            this.lastViewDay = null;// clear lastViewDay
+            this.firstDayOfWeek = firstDayOfWeek;
+
+//            final int firstDayOfWeek = getFirstDayOfWeek();
+            final Calendar firstDayOfGrid = getFirstDayOfGrid();
+
+            Calendar calendar = (Calendar) firstDayOfGrid.clone();
+            calendar.set(DAY_OF_WEEK, firstDayOfWeek);
+            for (WeekDayView dayView : weekDayViews) {
+                dayView.setDayOfWeek(calendar);
+                calendar.add(DATE, 1);
+            }
+
+            calendar = (Calendar) firstDayOfGrid.clone();
+            for (DayView dayView : dayViews) {
+                CalendarDay day = CalendarDay.from(calendar);
+                dayView.setDay(day);
+                calendar.add(DATE, 1);
+            }
+
+            enableStateChangeFlag = true;
+            postRefresh();
         }
     }
 
-    private void updateTimeRange() {
-        // todo init
-        final int firstDayOfWeek = getFirstDayOfWeek();
-        final Calendar firstDayOfGrid = getFirstDayOfGrid();
-
-        Calendar calendar = (Calendar) firstDayOfGrid.clone();
-        calendar.set(DAY_OF_WEEK, firstDayOfWeek);
-        for (WeekDayView dayView : weekDayViews) {
-            dayView.setDayOfWeek(calendar);
-            calendar.add(DATE, 1);
+    private Runnable refreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            refresh();
+            postRefreshingFlag = false;
         }
+    };
 
-        calendar = (Calendar) firstDayOfGrid.clone();
-        for (DayView dayView : dayViews) {
-            CalendarDay day = CalendarDay.from(calendar);
-            dayView.setDay(day);
-            calendar.add(DATE, 1);
+    private void postRefresh() {
+        if (!postRefreshingFlag) {
+            postRefreshingFlag = true;
+            post(refreshRunnable);
         }
+    }
 
-        updateUi();
+    private boolean postRefreshingFlag;
+    private boolean enableStateChangeFlag;
+
+    private void refresh() {
+        if (enableStateChangeFlag) {
+            for (DayView dayView : dayViews) {
+                CalendarDay day = dayView.getDate();
+                dayView.setupSelection(
+                        showOtherDates,
+                        day.isInRange(minDate, maxDate),
+                        isDayEnabled(day));
+            }
+            postInvalidate();
+
+            enableStateChangeFlag = false;
+        }
     }
 
     protected abstract boolean isDayEnabled(CalendarDay day);
@@ -191,8 +218,11 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     }
 
     public void setShowOtherDates(@ShowOtherDates int showFlags) {
-        this.showOtherDates = showFlags;
-        updateUi();
+        if (this.showOtherDates != showFlags) {
+            this.showOtherDates = showFlags;
+            enableStateChangeFlag = true;
+            postRefresh();
+        }
     }
 
     public void setSelectionEnabled(boolean selectionEnabled) {
@@ -221,30 +251,25 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     }
 
     public void setMinimumDate(CalendarDay minDate) {
-        this.minDate = minDate;
-        updateUi();
+        if (!(minDate == null ? this.minDate == null : minDate.equals(this.minDate))) {
+            this.minDate = minDate;
+            enableStateChangeFlag = true;
+            postRefresh();
+        }
     }
 
     public void setMaximumDate(CalendarDay maxDate) {
-        this.maxDate = maxDate;
-        updateUi();
+        if (!(maxDate == null ? this.maxDate == null : maxDate.equals(this.maxDate))) {
+            this.maxDate = maxDate;
+            enableStateChangeFlag = true;
+            postRefresh();
+        }
     }
 
     public void setSelectedDates(Collection<CalendarDay> dates) {
         for (DayView dayView : dayViews) {
             CalendarDay day = dayView.getDate();
             dayView.setChecked(dates != null && dates.contains(day));
-        }
-        postInvalidate();
-    }
-
-    protected void updateUi() {
-        for (DayView dayView : dayViews) {
-            CalendarDay day = dayView.getDate();
-            dayView.setupSelection(
-                    showOtherDates,
-                    day.isInRange(minDate, maxDate),
-                    isDayEnabled(day));
         }
         postInvalidate();
     }

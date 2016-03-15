@@ -139,10 +139,10 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         V pagerView = pagerPool.acquire();
-        // todo pool
         if (pagerView == null) {
             pagerView = createView(position);
         }
+        pagerView.setDate(getItem(position), getFirstDayOfWeek());
         pagerView.setAlpha(0);
         pagerView.setSelectionEnabled(selectionEnabled);
 
@@ -162,15 +162,15 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         pagerView.setMaximumDate(maxDate);
         pagerView.setSelectedDates(selectedDates);
 
-        container.addView(pagerView);
-        currentViews.add(pagerView);
-
         pagerView.setDayViewDecorators(decoratorResults);
         for (DayView view : pagerView.getDayViews()) {
             for (DayView.DecorateListener listener : mcv.getDayViewDecorateListeners()) {
                 listener.decorate(view);
             }
         }
+
+        container.addView(pagerView);
+        currentViews.add(pagerView);
         return pagerView;
     }
 
@@ -179,7 +179,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         V pagerView = (V) object;
         currentViews.remove(pagerView);
         container.removeView(pagerView);
-        if (pagerPool.release(pagerView)) {
+        if (!pagerPool.release(pagerView)) {
             Log.e(getClass().getSimpleName(), "recycle to pool fail, pool's size is to small");
         }
     }
@@ -187,7 +187,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
     public void setFirstDayOfWeek(int day) {
         firstDayOfTheWeek = day;
         for (V pagerView : currentViews) {
-            pagerView.setFirstDayOfWeek(firstDayOfTheWeek);
+            pagerView.setDate(pagerView.getFirstViewDay(), firstDayOfTheWeek);
         }
     }
 
