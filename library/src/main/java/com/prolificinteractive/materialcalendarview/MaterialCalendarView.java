@@ -150,6 +150,7 @@ public class MaterialCalendarView extends ViewGroup {
     private static final int DEFAULT_DAYS_IN_WEEK = 7;
     private static final int DAY_NAMES_ROW = 1;
     public static final int LAYOUT_MODE_NONE = 0;
+    private boolean isFirstMeasureBefore = true;
 
     /**
      * By default, the calendar will take up all the space needed to show any month (6 rows).
@@ -1362,6 +1363,7 @@ public class MaterialCalendarView extends ViewGroup {
      */
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+        isFirstMeasureBefore = false;
         final int specWidthSize = MeasureSpec.getSize(widthMeasureSpec);
         final int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         final int specHeightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -1445,9 +1447,17 @@ public class MaterialCalendarView extends ViewGroup {
         return showWeekDayView;
     }
 
+    /**
+     * can't dynamic change.
+     * must invoke this method when first measure before
+     * @param showWeekDayView
+     */
     public void setShowWeekDayView(boolean showWeekDayView) {
-        this.showWeekDayView = showWeekDayView;
-        requestLayout();
+        if (isFirstMeasureBefore) {
+            this.showWeekDayView = showWeekDayView;
+        } else {
+            throw new IllegalStateException("must invoke this method when first measure before");
+        }
     }
 
     private int measureTileSize;

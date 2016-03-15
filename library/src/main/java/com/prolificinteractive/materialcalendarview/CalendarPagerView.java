@@ -50,7 +50,9 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         setClipChildren(false);
         setClipToPadding(false);
 
-        addWeekDays();
+        if (mcv.isShowWeekDayView()) {
+            addWeekDays();
+        }
         addDayViews();
         addView(drawView);
     }
