@@ -66,9 +66,6 @@ public class DayView extends CheckedTextView {
         }
     }
 
-    void setDayInternal(CalendarDay date) {
-        this.date = date;
-    }
     public void setDay(CalendarDay date) {
         this.date = date;
         setText(getLabel());
@@ -229,7 +226,8 @@ public class DayView extends CheckedTextView {
 
         public static Drawable generateBackground(int color, int fadeTime) {
             StateListDrawable drawable;
-            if (true || sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
+            if (true // cache stateListDrawable have some problem when child Drawable is rippleDrawable...
+                    || sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
                 drawable = new StateListDrawable();
                 drawable.setExitFadeDuration(fadeTime);
                 drawable.addState(new int[]{android.R.attr.state_checked}, generateCircleDrawable(color));

@@ -135,7 +135,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         return index;
     }
 
-    private Pools.SimplePool<V> pagerPool = new Pools.SimplePool<>(5);
+    private Pools.SimplePool<V> pagerPool = new Pools.SimplePool<>(3);
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         V pagerView = pagerPool.acquire();
