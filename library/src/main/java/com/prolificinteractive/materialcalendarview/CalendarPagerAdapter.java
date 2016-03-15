@@ -135,7 +135,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         return index;
     }
 
-    private Pools.SimplePool<V> pagerPool = new Pools.SimplePool<>(3);
+    private Pools.SimplePool<V> pagerPool = new Pools.SimplePool<>(MaterialCalendarView.OFFSCREEN_PAGE_LIMIT * 2 + 1);
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         V pagerView = pagerPool.acquire();

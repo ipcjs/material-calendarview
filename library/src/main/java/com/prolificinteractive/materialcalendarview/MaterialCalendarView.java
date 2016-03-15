@@ -66,6 +66,7 @@ import java.util.List;
  */
 public class MaterialCalendarView extends ViewGroup {
 
+    static final int OFFSCREEN_PAGE_LIMIT = 1;
     /**
      * {@linkplain IntDef} annotation for selection mode.
      *
@@ -403,7 +404,7 @@ public class MaterialCalendarView extends ViewGroup {
         topbar.addView(buttonFuture, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
 
         pager.setId(R.id.mcv_pager);
-        pager.setOffscreenPageLimit(1);
+        pager.setOffscreenPageLimit(OFFSCREEN_PAGE_LIMIT);
         addView(pager, new LayoutParams(calendarMode.visibleWeeksCount + DAY_NAMES_ROW));
     }
 

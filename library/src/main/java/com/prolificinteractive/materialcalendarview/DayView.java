@@ -17,6 +17,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckedTextView;
@@ -171,7 +172,7 @@ public class DayView extends CheckedTextView {
             customBackground.setState(getDrawableState());
             customBackground.draw(canvas);
         }
-//        Log.d(getClass().getSimpleName(), getDate() + ", " + isChecked());
+        Log.d(getClass().getSimpleName(), getDate() + ", " + isChecked());
         super.onDraw(canvas);
     }
 
@@ -226,8 +227,8 @@ public class DayView extends CheckedTextView {
 
         public static Drawable generateBackground(Resources r, int color, int fadeTime) {
             StateListDrawable drawable;
-            if (true // cache stateListDrawable have some problem when child Drawable is rippleDrawable...
-                    || sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
+            if ( // cache stateListDrawable have some problem when child Drawable is rippleDrawable...
+                    sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
                 drawable = new StateListDrawable();
                 drawable.setExitFadeDuration(fadeTime);
                 drawable.addState(new int[]{android.R.attr.state_checked}, generateCircleDrawable(color));
