@@ -23,6 +23,8 @@ import com.prolificinteractive.materialcalendarview.sample.decorators.EventDecor
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.github.ipcjs.explorer.ExUtils.p;
+
 /**
  * Created by ipcjs on 2016/3/7.
  */
@@ -70,7 +72,7 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-
+                p(date, selected);
             }
         });
     }
