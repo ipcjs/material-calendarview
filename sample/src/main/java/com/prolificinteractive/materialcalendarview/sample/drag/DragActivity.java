@@ -63,9 +63,17 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
             }
 
             @Override
+            public void onDraw(CalendarPagerView cpv, Canvas canvas) {
+                super.onDraw(cpv, canvas);
+//                logd("onDraw", cpv.getFirstViewDay());
+            }
+
+            @Override
             protected void onDrawItem(CalendarPagerView cpv, CalendarDay day, Canvas canvas, float percent, int itemWidth, int itemHeight) {
-                paint.setColor((paint.getColor() & 0xffffff) | (int) (percent * 255 + 0.5f) << 24);
-                canvas.drawText(day.getMonth() + "-" + day.getDay(), 0, itemWidth, paint);
+                if (day.isBefore(CalendarDay.today())) {
+                    paint.setColor((paint.getColor() & 0xffffff) | (int) (percent * 255 + 0.5f) << 24);
+                    canvas.drawText((day.getMonth() + 1) + "-" + day.getDay(), 0, itemWidth, paint);
+                }
             }
         };
         materialCalendarView.setPagerOnDrawListener(listener);

@@ -270,7 +270,7 @@ public final class CalendarDay implements Parcelable {
 
     @Override
     public String toString() {
-        return "CalendarDay{" + year + "-" + month + "-" + day + "}";
+        return "CalendarDay{" + year + "-" + (month + 1) + "-" + day + "}";
     }
 
     /*

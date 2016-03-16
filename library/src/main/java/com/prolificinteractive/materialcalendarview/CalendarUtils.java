@@ -3,9 +3,11 @@ package com.prolificinteractive.materialcalendarview;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -18,6 +20,7 @@ import static java.util.Calendar.YEAR;
  * Utilities for Calendar
  */
 public class CalendarUtils {
+    public static final String TAG = "MCV";
 
     /**
      * @param date {@linkplain Date} to pull date information from
@@ -117,5 +120,13 @@ public class CalendarUtils {
     })
     @Retention(RetentionPolicy.SOURCE)
     @interface DayOfWeek {
+    }
+
+    public static void logd(Object... objs) {
+        if (true) Log.d(TAG, Arrays.deepToString(objs));
+    }
+
+    public static void loge(Object... objs) {
+        if (true) Log.e(TAG, Arrays.deepToString(objs));
     }
 }

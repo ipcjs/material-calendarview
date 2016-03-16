@@ -3,7 +3,6 @@ package com.prolificinteractive.materialcalendarview;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pools;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.logd;
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.loge;
 
 /**
  * Pager adapter backing the calendar view
@@ -171,6 +173,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
 
         container.addView(pagerView);
         currentViews.add(pagerView);
+//        logd("instantiateItem", pagerView.getFirstViewDay());
         return pagerView;
     }
 
@@ -180,7 +183,7 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         currentViews.remove(pagerView);
         container.removeView(pagerView);
         if (!pagerPool.release(pagerView)) {
-            Log.e(getClass().getSimpleName(), "recycle to pool fail, pool's size is to small");
+            loge("recycle (" + pagerView.getFirstViewDay() + ") to pool failed, pool's size is to small");
         }
     }
 

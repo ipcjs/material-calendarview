@@ -17,7 +17,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckedTextView;
@@ -172,7 +171,7 @@ public class DayView extends CheckedTextView {
             customBackground.setState(getDrawableState());
             customBackground.draw(canvas);
         }
-        Log.d(getClass().getSimpleName(), getDate() + ", " + isChecked());
+//        logd("DayView.onDraw", getDate() + ", " + isChecked());
         super.onDraw(canvas);
     }
 

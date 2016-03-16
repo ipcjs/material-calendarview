@@ -11,6 +11,12 @@ class DrawView extends View {
     private MaterialCalendarView mcv;
     private CalendarPagerView cpv;
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        invalidate();// guarantee to draw
+    }
+
     public DrawView(Context context, MaterialCalendarView mcv, CalendarPagerView cpv) {
         super(context);
         this.mcv = mcv;
