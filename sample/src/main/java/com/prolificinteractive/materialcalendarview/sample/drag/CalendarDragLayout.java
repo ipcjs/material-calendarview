@@ -68,12 +68,10 @@ public class CalendarDragLayout extends ViewGroup {
 
         mCalendarView.setLayoutMode(MaterialCalendarView.LAYOUT_MODE_VERTICAL_SPLIT);
         mCalendarView.setTopbarVisible(false);
-        mCalendarView.setShowWeekDayView(false);
 
         mWeekCalendarView.setLayoutMode(MaterialCalendarView.LAYOUT_MODE_NONE);
         mWeekCalendarView.setCalendarDisplayMode(CalendarMode.WEEKS);
         mWeekCalendarView.setTopbarVisible(false);
-        mWeekCalendarView.setShowWeekDayView(false);
 
         mListView = findViewById(R.id.view_list);
         mCaptureView = findViewById(R.id.view_capture);

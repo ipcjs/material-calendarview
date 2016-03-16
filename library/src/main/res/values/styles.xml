@@ -17,4 +17,7 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="MaterialCalendarView">
+        <item name="mcv_showWeekDayView">true</item>
+    </style>
 </resources>

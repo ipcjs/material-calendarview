@@ -7,6 +7,7 @@
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/view_calendar_month"
+        style="@style/MaterialCalendarView.NoWeek"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?colorPrimary"/>
@@ -14,6 +15,7 @@
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/view_calendar_week"
         android:layout_width="match_parent"
+        style="@style/MaterialCalendarView.NoWeek"
         android:layout_height="wrap_content"
         android:background="?colorPrimary"/>
 

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <declare-styleable name="Theme">
+        <attr name="mcvStyle" format="reference"/>
+    </declare-styleable>
     <declare-styleable name="MaterialCalendarView">
 
         <attr name="mcv_dateTextAppearance" format="reference"/>
@@ -35,6 +38,7 @@
             <enum name="friday" value="6" />
             <enum name="saturday" value="7" />
         </attr>
+        <attr name="mcv_showWeekDayView" format="boolean"/>
 
     </declare-styleable>
 

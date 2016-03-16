@@ -151,7 +151,6 @@ public class MaterialCalendarView extends ViewGroup {
     private static final int DEFAULT_DAYS_IN_WEEK = 7;
     private static final int DAY_NAMES_ROW = 1;
     public static final int LAYOUT_MODE_NONE = 0;
-    private boolean isFirstMeasureBefore = true;
 
     /**
      * By default, the calendar will take up all the space needed to show any month (6 rows).
@@ -185,6 +184,11 @@ public class MaterialCalendarView extends ViewGroup {
     private CalendarDay currentMonth;
     private LinearLayout topbar;
     private CalendarMode calendarMode = CalendarMode.MONTHS;
+    /**
+     * only change by xml
+     * @see R.attr#mcv_showWeekDayView
+     * @see R.styleable#MaterialCalendarView_mcv_showWeekDayView
+     */
     private boolean showWeekDayView = true;
 
     private final ArrayList<DayViewDecorator> dayViewDecorators = new ArrayList<>();
@@ -252,7 +256,11 @@ public class MaterialCalendarView extends ViewGroup {
     }
 
     public MaterialCalendarView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, R.attr.mcvStyle);
+    }
+
+    public MaterialCalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //If we're on good Android versions, turn off clipping for cool effects
@@ -289,10 +297,9 @@ public class MaterialCalendarView extends ViewGroup {
             }
         });
 
-        TypedArray a = context.getTheme()
-                .obtainStyledAttributes(attrs, R.styleable.MaterialCalendarView, 0, 0);
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.MaterialCalendarView, defStyleAttr, R.style.MaterialCalendarView);
         try {
-
+            showWeekDayView = a.getBoolean(R.styleable.MaterialCalendarView_mcv_showWeekDayView, showWeekDayView);
             int tileSize = a.getDimensionPixelSize(R.styleable.MaterialCalendarView_mcv_tileSize, -1);
             if (tileSize > 0) {
                 setTileSize(tileSize);
@@ -1364,7 +1371,6 @@ public class MaterialCalendarView extends ViewGroup {
      */
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        isFirstMeasureBefore = false;
         final int specWidthSize = MeasureSpec.getSize(widthMeasureSpec);
         final int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         final int specHeightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -1446,19 +1452,6 @@ public class MaterialCalendarView extends ViewGroup {
 
     public boolean isShowWeekDayView() {
         return showWeekDayView;
-    }
-
-    /**
-     * can't dynamic change.
-     * must invoke this method when first measure before
-     * @param showWeekDayView
-     */
-    public void setShowWeekDayView(boolean showWeekDayView) {
-        if (isFirstMeasureBefore) {
-            this.showWeekDayView = showWeekDayView;
-        } else {
-            throw new IllegalStateException("must invoke this method when first measure before");
-        }
     }
 
     private int measureTileSize;
