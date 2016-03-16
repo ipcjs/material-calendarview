@@ -73,6 +73,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     }
 
     protected abstract CalendarDay computeLastViewDay();
+
     public int getActualRowHeight() {
         return actualRowHeight;
     }
@@ -287,6 +288,10 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
             }
             dayView.applyFacade(facadeAccumulator);
         }
+    }
+
+    void invalidateDrawView() {
+        drawView.invalidate();
     }
 
     @Override

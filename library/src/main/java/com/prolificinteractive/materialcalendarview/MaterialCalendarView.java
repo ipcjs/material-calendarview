@@ -1228,6 +1228,12 @@ public class MaterialCalendarView extends ViewGroup {
         this.pagerOnDrawListener = pagerOnDrawListener;
     }
 
+    public void invalidateDrawView() {
+        for (CalendarPagerView pagerView : adapter.getCurrentViews()) {
+            pagerView.invalidateDrawView();
+        }
+    }
+
     public CalendarPagerView.OnDrawListener getPagerOnDrawListener() {
         return pagerOnDrawListener;
     }
