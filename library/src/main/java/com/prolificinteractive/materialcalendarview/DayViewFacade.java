@@ -38,7 +38,7 @@ public class DayViewFacade {
 
     /**
      * Set a custom selection drawable
-     * TODO: define states that can/should be used in StateListDrawables
+     * define states that can/should be used in StateListDrawables
      *
      * @param drawable the drawable for selection
      */

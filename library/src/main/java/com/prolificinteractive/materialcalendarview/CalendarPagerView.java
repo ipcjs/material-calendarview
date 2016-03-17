@@ -327,18 +327,19 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         //Just use the spec sizes
         setMeasuredDimension(specWidthSize, specHeightSize);
 
-        scalePercent = 0;
-        actualRowHeight = measuredTileSize;
         if (mcv.isVerticalSplit()) {
-            int actualTileRowCount = getActualWeekCount() + getOtherRowCount();
-            actualRowHeight = getMeasuredHeight() / actualTileRowCount;
+            actualRowHeight = getMeasuredHeight() / (getActualWeekCount() + getOtherRowCount());
             scalePercent = mcv.computeScalePercent();
+        } else {
+            actualRowHeight = measuredTileSize;
+            scalePercent = 0;
         }
 
-        if (mcv.isShowWeekDayView()) {
-            measure(false, weekDayViews);
-        }
-        measure(true, dayViews);
+        // drawView, dayViews and weekDayViews is sample, skip measure, direct layout!
+//        if (mcv.isShowWeekDayView()) {
+//            measure(false, weekDayViews);
+//        }
+//        measure(true, dayViews);
     }
 
     private void measure(boolean isDayView, List<? extends View> views) {
@@ -367,7 +368,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
             childTop = layout(weekDayViews, parentLeft, parentLeft, childTop);
         }
         childTop = layout(dayViews, parentLeft, parentLeft, childTop);
-        // dayView is sample, no need to measure, only layout is ok~~
         drawView.layout(0, getOtherRowCount() * getActualRowHeight(), getWidth(), getHeight());
     }
 
@@ -375,8 +375,8 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         for (int i = 0; i < views.size(); i++) {
             final View child = views.get(i);
 
-            final int width = child.getMeasuredWidth();
-            final int height = child.getMeasuredHeight();
+            final int width = /*child.getMeasuredWidth()*/measuredTileSize;
+            final int height = /*child.getMeasuredHeight()*/measuredTileSize;
 
             child.layout(childLeft, top, childLeft + width, top + height);
 

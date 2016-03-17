@@ -226,7 +226,7 @@ public class DayView extends CheckedTextView {
 
         public static Drawable generateBackground(Resources r, int color, int fadeTime) {
             StateListDrawable drawable;
-            if ( // cache stateListDrawable have some problem when child Drawable is rippleDrawable...
+            if ( // todo: cache stateListDrawable have some problem when child Drawable is rippleDrawable...
                     sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
                 drawable = new StateListDrawable();
                 drawable.setExitFadeDuration(fadeTime);
