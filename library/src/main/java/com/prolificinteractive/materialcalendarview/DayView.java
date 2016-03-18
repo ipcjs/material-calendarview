@@ -4,15 +4,13 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.SpannableString;
@@ -179,7 +177,7 @@ public class DayView extends CheckedTextView {
         if (selectionDrawable != null) {
             setBackgroundDrawable(selectionDrawable);
         } else {
-            setBackgroundDrawable(DrawableUtil.generateBackground(getResources(), selectionColor, fadeTime));
+            setBackgroundDrawable(DrawableUtil.generateBackground(getContext(), selectionColor, fadeTime));
         }
     }
 
@@ -224,36 +222,36 @@ public class DayView extends CheckedTextView {
         private static int sBackgroundFadeTime;
         private static Drawable.ConstantState sBackgroundState;
 
-        public static Drawable generateBackground(Resources r, int color, int fadeTime) {
+        public static Drawable generateBackground(Context context, int color, int fadeTime) {
             StateListDrawable drawable;
-            if ( // todo: cache stateListDrawable have some problem when child Drawable is rippleDrawable...
-                    sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
+            if (sBackgroundState == null || sBackgroundColor != color || sBackgroundFadeTime != fadeTime) {
                 drawable = new StateListDrawable();
                 drawable.setExitFadeDuration(fadeTime);
-                drawable.addState(new int[]{android.R.attr.state_checked}, generateCircleDrawable(color));
+                drawable.addState(new int[]{android.R.attr.state_checked}, generateCircleDrawable(context, color));
                 drawable.addState(new int[]{android.R.attr.state_pressed}, Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                        ? generateRippleDrawable(color)
-                        : generateCircleDrawable(color));
-                drawable.addState(new int[]{}, generateCircleDrawable(Color.TRANSPARENT));
+                        ? generateRippleDrawable(context, color)
+                        : generateCircleDrawable(context, color));
+                drawable.addState(new int[]{}, generateCircleDrawable(context, Color.TRANSPARENT));
                 sBackgroundState = drawable.getConstantState();
                 sBackgroundColor = color;
                 sBackgroundFadeTime = fadeTime;
             } else {
-                drawable = (StateListDrawable) sBackgroundState.newDrawable(r);
+                drawable = (StateListDrawable) sBackgroundState.newDrawable(context.getResources());
             }
             return drawable;
         }
 
-        private static Drawable generateCircleDrawable(final int color) {
-            ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
-            drawable.getPaint().setColor(color);
+        private static Drawable generateCircleDrawable(Context context, final int color) {
+            final GradientDrawable drawable = new GradientDrawable();
+            drawable.setShape(GradientDrawable.OVAL);
+            drawable.setColor(color);
             return drawable;
         }
 
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-        private static Drawable generateRippleDrawable(final int color) {
+        private static Drawable generateRippleDrawable(Context context, final int color) {
             ColorStateList list = ColorStateList.valueOf(color);
-            Drawable mask = generateCircleDrawable(Color.WHITE);
+            Drawable mask = generateCircleDrawable(context, Color.WHITE);
             return new RippleDrawable(list, null, mask);
         }
     }
