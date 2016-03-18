@@ -30,7 +30,7 @@ public class WeekTitleView extends ViewGroup {
         if (this.firstDayOfWeek == firstDayOfWeek) {
             return;
         }
-        int size = CalendarPagerView.DEFAULT_DAYS_IN_WEEK;
+        int size = MaterialCalendarView.DEFAULT_DAYS_IN_WEEK;
         boolean needCreate = weekDayViews == null;
         if (needCreate) {
             weekDayViews = new ArrayList<>();

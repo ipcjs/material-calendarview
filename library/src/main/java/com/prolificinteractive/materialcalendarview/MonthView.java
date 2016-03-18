@@ -12,8 +12,6 @@ import java.util.Calendar;
  */
 @SuppressLint("ViewConstructor")
 class MonthView extends CalendarPagerView {
-
-    private static final int DEFAULT_DAYS_IN_WEEK = 7;
     private static final int DEFAULT_MAX_WEEKS = 6;
 
     @Override

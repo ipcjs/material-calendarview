@@ -18,13 +18,13 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
+import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.DEFAULT_DAYS_IN_WEEK;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_NONE;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.showOtherMonths;
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.DAY_OF_WEEK;
 
 public abstract class CalendarPagerView extends ViewGroup implements View.OnClickListener {
-    public static final int DEFAULT_DAYS_IN_WEEK = 7;
     private static final Calendar tmpCalendar = CalendarUtils.getInstance();
     private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
     private final List<DayView> dayViews = new ArrayList<>();

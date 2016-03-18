@@ -66,6 +66,7 @@ import java.util.List;
  */
 public class MaterialCalendarView extends ViewGroup {
 
+    public static final int DEFAULT_DAYS_IN_WEEK = 7;
     static final int OFFSCREEN_PAGE_LIMIT = 1;
     /**
      * {@linkplain IntDef} annotation for selection mode.
@@ -148,8 +149,6 @@ public class MaterialCalendarView extends ViewGroup {
      * Default tile size in DIPs. This is used in cases where there is no tile size specificed and the view is set to {@linkplain ViewGroup.LayoutParams#WRAP_CONTENT WRAP_CONTENT}
      */
     public static final int DEFAULT_TILE_SIZE_DP = 44;
-    private static final int DEFAULT_DAYS_IN_WEEK = 7;
-    private static final int DAY_NAMES_ROW = 1;
     public static final int LAYOUT_MODE_NONE = 0;
 
     /**
@@ -385,7 +384,7 @@ public class MaterialCalendarView extends ViewGroup {
             monthView.setDateTextAppearance(adapter.getDateTextAppearance());
             monthView.setWeekDayTextAppearance(adapter.getWeekDayTextAppearance());
             monthView.setShowOtherDates(getShowOtherDates());
-            addView(monthView, new LayoutParams(calendarMode.visibleWeeksCount + DAY_NAMES_ROW));
+            addView(monthView, new LayoutParams());
         }
     }
 
@@ -395,7 +394,7 @@ public class MaterialCalendarView extends ViewGroup {
         topbar.setOrientation(LinearLayout.HORIZONTAL);
         topbar.setClipChildren(false);
         topbar.setClipToPadding(false);
-        addView(topbar, new LayoutParams(1));
+        addView(topbar);
 
         buttonPast.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         buttonPast.setImageResource(R.drawable.mcv_action_previous);
@@ -412,7 +411,7 @@ public class MaterialCalendarView extends ViewGroup {
 
         pager.setId(R.id.mcv_pager);
         pager.setOffscreenPageLimit(OFFSCREEN_PAGE_LIMIT);
-        addView(pager, new LayoutParams(calendarMode.visibleWeeksCount + DAY_NAMES_ROW));
+        addView(pager);
     }
 
     private void updateUi() {
@@ -1369,7 +1368,7 @@ public class MaterialCalendarView extends ViewGroup {
      */
     @Override
     protected LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams(1);
+        return new LayoutParams();
     }
 
     /**
@@ -1386,7 +1385,11 @@ public class MaterialCalendarView extends ViewGroup {
         final int desiredWidth = specWidthSize - getPaddingLeft() - getPaddingRight();
         final int desiredHeight = specHeightSize - getPaddingTop() - getPaddingBottom();
 
-        final int tileRowCount = getTileRowCount();
+        final int weekRowCount = getWeekRowCount();
+        final int weekDayViewRowCount = getWeekDayViewRowCount();
+        final int topbarRowCount = getTopbarRowCount();
+
+        final int tileRowCount = weekRowCount + weekDayViewRowCount + topbarRowCount;
 
         //Calculate independent tile sizes for later
         int desiredTileWidth = desiredWidth / DEFAULT_DAYS_IN_WEEK;
@@ -1430,30 +1433,17 @@ public class MaterialCalendarView extends ViewGroup {
                 clampSize(measuredHeight, heightMeasureSpec)
         );
 
-        int count = getChildCount();
-
-        for (int i = 0; i < count; i++) {
-            final View child = getChildAt(i);
-
-            LayoutParams p = (LayoutParams) child.getLayoutParams();
-
-            int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
-                    DEFAULT_DAYS_IN_WEEK * measureTileSize,
-                    MeasureSpec.EXACTLY
-            );
-
-            int heightSize = p.tileHeight * measureTileSize;
-            if (isVerticalSplit() && child == pager) {
-                // pager占用除topbar外的所有空间
-                heightSize = getMeasuredHeight() - (getTopbarVisible() ? topbar.getMeasuredHeight() : 0);
-            }
-            int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                    heightSize,
-                    MeasureSpec.EXACTLY
-            );
-
-            child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+        int pagerHeight;
+        if (isVerticalSplit()) {
+            pagerHeight = getMeasuredHeight() - measureTileSize * topbarRowCount;
+        } else {
+            pagerHeight = (weekRowCount + weekDayViewRowCount) * measureTileSize;
         }
+
+        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(DEFAULT_DAYS_IN_WEEK * measureTileSize, MeasureSpec.EXACTLY);
+
+        topbar.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(1 * measureTileSize, MeasureSpec.EXACTLY));
+        pager.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(pagerHeight, MeasureSpec.EXACTLY));
     }
 
     public boolean isShowWeekDayView() {
@@ -1463,26 +1453,19 @@ public class MaterialCalendarView extends ViewGroup {
     private int measureTileSize;
 
     public int getMeasureNormalHeight() {
-        return measureTileSize * getTileRowCount();
+        return measureTileSize * (getWeekRowCount() + getTopbarRowCount() + getWeekDayViewRowCount());
     }
 
     public int getMeasureMinHeight() {
-        return measureTileSize * (1 + getOtherRowCount());
+        return measureTileSize * (CalendarMode.WEEKS.visibleWeeksCount + getTopbarRowCount() + getWeekDayViewRowCount());
     }
 
-    private int getTileRowCount() {
-        return getWeekRowCount() + getOtherRowCount();
+    private int getTopbarRowCount() {
+        return getTopbarVisible() ? 1 : 0;
     }
 
-    private int getOtherRowCount() {
-        int count = 0;
-        if (isShowWeekDayView()) {
-            count++;
-        }
-        if (getTopbarVisible()) {
-            count++;
-        }
-        return count;
+    private int getWeekDayViewRowCount() {
+        return isShowWeekDayView() ? 1 : 0;
     }
 
     private int getWeekRowCount() {
@@ -1582,7 +1565,7 @@ public class MaterialCalendarView extends ViewGroup {
      */
     @Override
     public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new LayoutParams(1);
+        return new LayoutParams();
     }
 
     @Override
@@ -1600,7 +1583,7 @@ public class MaterialCalendarView extends ViewGroup {
 
     @Override
     protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
-        return new LayoutParams(1);
+        return new LayoutParams();
     }
 
 
@@ -1620,17 +1603,8 @@ public class MaterialCalendarView extends ViewGroup {
      * Simple layout params for MaterialCalendarView. The only variation for layout is height.
      */
     protected static class LayoutParams extends MarginLayoutParams {
-
-        /**
-         * Create a layout that matches parent width, and is X number of tiles high
-         *
-         * @param tileHeight view height in number of tiles
-         */
-        public int tileHeight;
-
-        public LayoutParams(int tileHeight) {
+        public LayoutParams() {
             super(MATCH_PARENT, WRAP_CONTENT);
-            this.tileHeight = tileHeight;
         }
     }
 
