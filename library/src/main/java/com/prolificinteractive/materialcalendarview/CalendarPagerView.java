@@ -2,6 +2,7 @@ package com.prolificinteractive.materialcalendarview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
@@ -18,6 +19,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.logd;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.DEFAULT_DAYS_IN_WEEK;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_NONE;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.showOtherMonths;
@@ -55,6 +57,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         }
         addDayViews();
         addView(drawView);
+        setWillNotDraw(false);
     }
 
     List<DayView> getDayViews() {
@@ -361,6 +364,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
      */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        logd("CPV.onLayout", getFirstViewDay(), changed, left, top, right, bottom);
         final int parentLeft = 0;
         int childTop = 0;
         if (mcv.isShowWeekDayView()) {
@@ -389,6 +393,13 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
             }
         }
         return top;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        logd("CPV.onDraw", getFirstViewDay());
+        canvas.drawColor(Color.YELLOW);
     }
 
     /**
@@ -425,7 +436,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         return new LayoutParams();
     }
 
-
     @Override
     public void onInitializeAccessibilityEvent(@NonNull AccessibilityEvent event) {
         super.onInitializeAccessibilityEvent(event);
@@ -452,7 +462,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
     public interface OnDrawListener {
         /**
-         * @param cpv   current drawing view
+         * @param cpv    current drawing view
          * @param canvas current canvas
          * @see #getMeasuredTileSize()
          * @see #getActualRowHeight()

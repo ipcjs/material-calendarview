@@ -25,7 +25,8 @@ class DrawView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (mcv.getPagerOnDrawListener() != null) {
+//        logd("draw", cpv.getFirstViewDay());
+         if (mcv.getPagerOnDrawListener() != null) {
             mcv.getPagerOnDrawListener().onDraw(cpv, canvas);
         }
     }

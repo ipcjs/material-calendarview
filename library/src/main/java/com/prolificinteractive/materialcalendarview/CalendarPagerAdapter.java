@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.logd;
 import static com.prolificinteractive.materialcalendarview.CalendarUtils.loge;
 
 /**
@@ -172,12 +173,14 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
 
         container.addView(pagerView);
         currentViews.add(pagerView);
+        logd("instantiateItem", pagerView.getFirstViewDay());
         return pagerView;
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         V pagerView = (V) object;
+        logd("destroyItem", pagerView.getFirstViewDay());
         currentViews.remove(pagerView);
         container.removeView(pagerView);
         if (!pagerPool.release(pagerView)) {

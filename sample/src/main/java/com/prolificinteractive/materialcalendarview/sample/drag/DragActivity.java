@@ -1,15 +1,12 @@
 package com.prolificinteractive.materialcalendarview.sample.drag;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import com.github.ipcjs.explorer.compat.CompatContextInterface;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -28,7 +25,7 @@ import static com.github.ipcjs.explorer.ExUtils.p;
 /**
  * Created by ipcjs on 2016/3/7.
  */
-public class DragActivity extends AppCompatActivity implements CompatContextInterface {
+public class DragActivity extends BaseActivity implements CompatContextInterface {
 
     public static final int DAY_ONE_WEEK = 7;
 
@@ -85,13 +82,4 @@ public class DragActivity extends AppCompatActivity implements CompatContextInte
         });
     }
 
-    @Override
-    public Context getContext() {
-        return this;
-    }
-
-    @Override
-    public <V extends View> V $(int id) {
-        return (V) findViewById(id);
-    }
 }

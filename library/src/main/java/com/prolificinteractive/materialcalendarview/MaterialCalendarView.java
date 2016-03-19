@@ -68,6 +68,8 @@ public class MaterialCalendarView extends ViewGroup {
 
     public static final int DEFAULT_DAYS_IN_WEEK = 7;
     static final int OFFSCREEN_PAGE_LIMIT = 1;
+    private MonthView preView;
+
     /**
      * {@linkplain IntDef} annotation for selection mode.
      *
@@ -199,12 +201,16 @@ public class MaterialCalendarView extends ViewGroup {
         @Override
         public void onClick(View v) {
             if (v == buttonFuture) {
-                pager.setCurrentItem(pager.getCurrentItem() + 1, true);
+                goTo(1, true);
             } else if (v == buttonPast) {
-                pager.setCurrentItem(pager.getCurrentItem() - 1, true);
+                goTo(-1, true);
             }
         }
     };
+
+    public void goTo(int delta, boolean smooth) {
+        pager.setCurrentItem(pager.getCurrentItem() + delta, smooth);
+    }
 
     private final ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -378,13 +384,13 @@ public class MaterialCalendarView extends ViewGroup {
 
         if (isInEditMode()) {
             removeView(pager);
-            MonthView monthView = new MonthView(getContext(), this);
-            monthView.setDate(currentMonth, getFirstDayOfWeek());
-            monthView.setSelectionColor(getSelectionColor());
-            monthView.setDateTextAppearance(adapter.getDateTextAppearance());
-            monthView.setWeekDayTextAppearance(adapter.getWeekDayTextAppearance());
-            monthView.setShowOtherDates(getShowOtherDates());
-            addView(monthView, new LayoutParams());
+            preView = new MonthView(getContext(), this);
+            preView.setDate(currentMonth, getFirstDayOfWeek());
+            preView.setSelectionColor(getSelectionColor());
+            preView.setDateTextAppearance(adapter.getDateTextAppearance());
+            preView.setWeekDayTextAppearance(adapter.getWeekDayTextAppearance());
+            preView.setShowOtherDates(getShowOtherDates());
+            addView(preView, new LayoutParams());
         }
     }
 
@@ -1443,7 +1449,7 @@ public class MaterialCalendarView extends ViewGroup {
         int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(DEFAULT_DAYS_IN_WEEK * measureTileSize, MeasureSpec.EXACTLY);
 
         topbar.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(1 * measureTileSize, MeasureSpec.EXACTLY));
-        pager.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(pagerHeight, MeasureSpec.EXACTLY));
+        (isInEditMode() ? preView : pager).measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(pagerHeight, MeasureSpec.EXACTLY));
     }
 
     public boolean isShowWeekDayView() {
