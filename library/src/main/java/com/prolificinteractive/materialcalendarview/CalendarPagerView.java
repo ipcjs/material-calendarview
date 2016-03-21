@@ -31,7 +31,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
     private final List<DayView> dayViews = new ArrayList<>();
     private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<>();
-    private final DrawView drawView;
     @ShowOtherDates
     protected int showOtherDates = SHOW_NONE;
     private MaterialCalendarView mcv;
@@ -47,7 +46,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     public CalendarPagerView(Context context, @NonNull MaterialCalendarView mcv) {
         super(context);
         this.mcv = mcv;
-        this.drawView = new DrawView(getContext(), mcv, this);
 
         setClipChildren(false);
         setClipToPadding(false);
@@ -56,8 +54,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
             addWeekDays();
         }
         addDayViews();
-        addView(drawView);
-        setWillNotDraw(false);
+//        setWillNotDraw(false);
     }
 
     List<DayView> getDayViews() {
@@ -294,7 +291,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
     }
 
     void invalidateDrawView() {
-        drawView.invalidate();
+        this.invalidate();
     }
 
     @Override
@@ -371,8 +368,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
             childTop = layout(weekDayViews, parentLeft, parentLeft, childTop);
         }
         childTop = layout(dayViews, parentLeft, parentLeft, childTop);
-        // dayView is sample, no need to measure, only layout is ok~~
-        drawView.layout(0, getOtherRowCount() * getActualRowHeight(), getWidth(), getHeight());
     }
 
     private int layout(List<? extends View> views, int parentLeft, int childLeft, int top) {
@@ -393,6 +388,22 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
             }
         }
         return top;
+    }
+
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+        if (mcv.getPagerOnDrawListener() != null) {
+            final int save = canvas.save();
+            canvas.translate(0, getOtherRowCount() * actualRowHeight);
+            mcv.getPagerOnDrawListener().onDraw(this, canvas);
+            canvas.restoreToCount(save);
+        }
+    }
+
+    @Override
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+        return super.drawChild(canvas, child, drawingTime);
     }
 
     @Override
