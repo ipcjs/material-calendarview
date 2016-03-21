@@ -180,7 +180,7 @@ public class MaterialCalendarView extends ViewGroup {
     private final TextView title;
     private final DirectionButton buttonPast;
     private final DirectionButton buttonFuture;
-    private final CalendarPager pager;
+    private final CalendarViewPager pager;
     private CalendarPagerAdapter<?> adapter;
     private CalendarDay currentMonth;
     private LinearLayout topbar;
@@ -201,14 +201,14 @@ public class MaterialCalendarView extends ViewGroup {
         @Override
         public void onClick(View v) {
             if (v == buttonFuture) {
-                goTo(1, true);
+                setCurrentItemByDelta(1, true);
             } else if (v == buttonPast) {
-                goTo(-1, true);
+                setCurrentItemByDelta(-1, true);
             }
         }
     };
 
-    public void goTo(int delta, boolean smooth) {
+    public void setCurrentItemByDelta(int delta, boolean smooth) {
         pager.setCurrentItem(pager.getCurrentItem() + delta, smooth);
     }
 
@@ -280,7 +280,7 @@ public class MaterialCalendarView extends ViewGroup {
         buttonPast = new DirectionButton(getContext());
         title = new TextView(getContext());
         buttonFuture = new DirectionButton(getContext());
-        pager = new CalendarPager(getContext());
+        pager = new CalendarViewPager(getContext());
 
         setupChildren();
 

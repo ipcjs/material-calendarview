@@ -7,11 +7,11 @@ import android.view.MotionEvent;
 /**
  * Custom ViewPager that allows swiping to be disabled.
  */
-class CalendarPager extends BetterViewPager {
+class CalendarViewPager extends BetterViewPager {
 
     private boolean pagingEnabled = true;
 
-    public CalendarPager(Context context) {
+    public CalendarViewPager(Context context) {
         super(context);
     }
 

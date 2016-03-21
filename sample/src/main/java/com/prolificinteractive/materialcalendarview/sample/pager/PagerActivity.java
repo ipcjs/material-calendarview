@@ -56,18 +56,18 @@ public class PagerActivity extends BaseActivity implements OnDateSelectedListene
 
     @OnClick(R.id.to_left)
     public void toLeft() {
-        mcv.goTo(-getDelta(), isSmooth());
+        mcv.setCurrentItemByDelta(-getDelta(), isSmooth());
     }
 
     @OnClick(R.id.to_right)
     public void toRight() {
-        mcv.goTo(getDelta(), isSmooth());
+        mcv.setCurrentItemByDelta(getDelta(), isSmooth());
     }
 
     @OnClick(R.id.refresh)
     public void refresh() {
-        mcv.goTo(1, false);
-        mcv.goTo(-1, false);
+        mcv.setCurrentItemByDelta(1, false);
+        mcv.setCurrentItemByDelta(-1, false);
     }
 
     @OnCheckedChanged(R.id.check_visible)
