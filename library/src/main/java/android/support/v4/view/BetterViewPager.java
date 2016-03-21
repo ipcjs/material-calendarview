@@ -21,9 +21,4 @@ public class BetterViewPager extends ViewPager {
     public void setChildrenDrawingOrderEnabledCompat(boolean enable) {
         setChildrenDrawingOrderEnabled(enable);
     }
-
-    @Override
-    public void populate() {
-        super.populate();
-    }
 }

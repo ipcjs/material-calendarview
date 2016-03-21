@@ -405,11 +405,6 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
         return super.drawChild(canvas, child, drawingTime);
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-    }
-
     /**
      * {@inheritDoc}
      */
