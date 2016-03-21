@@ -3,6 +3,7 @@ package com.prolificinteractive.materialcalendarview.sample.pager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
@@ -18,7 +19,7 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
-import static com.prolificinteractive.materialcalendarview.CalendarUtils.logd;
+import static com.github.ipcjs.explorer.ExUtils.p;
 
 /**
  * Created by ipcjs on 2016/3/19.
@@ -66,8 +67,20 @@ public class PagerActivity extends BaseActivity implements OnDateSelectedListene
 
     @OnClick(R.id.refresh)
     public void refresh() {
-        mcv.setCurrentItemByDelta(1, false);
-        mcv.setCurrentItemByDelta(-1, false);
+//        mcv.setCurrentItemByDelta(1, false);
+//        mcv.setCurrentItemByDelta(-1, false);
+        refresh(mcv);
+    }
+
+    private void refresh(View v) {
+        if (v instanceof ViewGroup) {
+            final int count = ((ViewGroup) v).getChildCount();
+            for (int i = 0; i < count; i++) {
+                refresh(((ViewGroup) v).getChildAt(i));
+            }
+        } else {
+            v.invalidate();
+        }
     }
 
     @OnCheckedChanged(R.id.check_visible)
@@ -77,12 +90,12 @@ public class PagerActivity extends BaseActivity implements OnDateSelectedListene
 
     @Override
     public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-        logd("onDateSelected", date, selected);
+        p("onDateSelected", date, selected);
     }
 
     @Override
     public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
-        logd("onMonthChanged", date);
+        p("onMonthChanged", date);
     }
 }
 
