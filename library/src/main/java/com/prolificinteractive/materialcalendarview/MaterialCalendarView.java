@@ -42,6 +42,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.DEBUG;
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.logd;
+
 /**
  * <p>
  * This class is a calendar widget for displaying and selecting dates.
@@ -300,7 +303,7 @@ public class MaterialCalendarView extends ViewGroup {
                 final float abs = Math.abs(position);
                 final float alpha = abs < 1 ? (float) Math.sqrt(1 - abs) : 1;
                 page.setAlpha(alpha);
-//                logd(((CalendarPagerView) page).getFirstViewDay(), alpha, abs, position);
+                if (DEBUG) logd(((CalendarPagerView) page).getFirstViewDay(), alpha, abs, position);
             }
         });
 

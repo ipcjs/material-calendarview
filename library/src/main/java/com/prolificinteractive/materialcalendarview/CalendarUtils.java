@@ -129,4 +129,5 @@ public class CalendarUtils {
     public static void loge(Object... objs) {
         if (true) Log.e(TAG, Arrays.deepToString(objs));
     }
+    public static final boolean DEBUG = false;
 }

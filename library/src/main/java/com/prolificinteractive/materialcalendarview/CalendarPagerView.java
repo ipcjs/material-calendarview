@@ -18,6 +18,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.DEBUG;
+import static com.prolificinteractive.materialcalendarview.CalendarUtils.logd;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.DEFAULT_DAYS_IN_WEEK;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_NONE;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.showOtherMonths;
@@ -359,7 +361,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
      */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-//        logd("CPV.onLayout", getFirstViewDay(), changed, left, top, right, bottom);
+        if (DEBUG) logd("CPV.onLayout", getFirstViewDay(), changed, left, top, right, bottom);
         final int parentLeft = 0;
         int childTop = 0;
         if (mcv.isShowWeekDayView()) {
@@ -390,7 +392,7 @@ public abstract class CalendarPagerView extends ViewGroup implements View.OnClic
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-//        logd("CPV.dispatchDraw", getFirstViewDay());
+        if (DEBUG) logd("CPV.dispatchDraw", getFirstViewDay());
         super.dispatchDraw(canvas);
         if (mcv.getPagerOnDrawListener() != null) {
             final int save = canvas.save();
