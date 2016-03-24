@@ -21,4 +21,7 @@ public class BetterViewPager extends ViewPager {
     public void setChildrenDrawingOrderEnabledCompat(boolean enable) {
         setChildrenDrawingOrderEnabled(enable);
     }
+
+    public interface Decor extends ViewPager.Decor {
+    }
 }
