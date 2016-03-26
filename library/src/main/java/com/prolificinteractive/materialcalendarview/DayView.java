@@ -111,14 +111,48 @@ public class DayView extends CheckedTextView {
         regenerateBackground();
     }
 
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+        if (customBackground != null) {
+            if (customBackground.isStateful()) {
+                customBackground.setState(getDrawableState());
+            }
+        }
+    }
+
+    @Override
+    public void jumpDrawablesToCurrentState() {
+        super.jumpDrawablesToCurrentState();
+        if (customBackground != null) {
+            customBackground.jumpToCurrentState();
+        }
+    }
+
+    @Override
+    protected boolean verifyDrawable(Drawable who) {
+        return super.verifyDrawable(who) || customBackground == who;
+    }
+
     /**
      * @param drawable background to draw behind everything else
      */
     public void setCustomBackground(Drawable drawable) {
-        if (drawable == null) {
-            this.customBackground = null;
-        } else {
-            this.customBackground = drawable.getConstantState().newDrawable(getResources());
+        if (customBackground == drawable) {
+            return;
+        }
+        if (customBackground != null) {
+            customBackground.setCallback(null);
+            unscheduleDrawable(customBackground);
+            customBackground = null;
+        }
+        if (drawable != null) {
+            Drawable tmp = drawable.getConstantState().newDrawable(getResources());
+            tmp.setCallback(this);
+            if (tmp.isStateful()) {
+                tmp.setState(getDrawableState());
+            }
+            this.customBackground = tmp;
         }
         invalidate();
     }
@@ -166,7 +200,7 @@ public class DayView extends CheckedTextView {
         if (customBackground != null) {
             canvas.getClipBounds(tempRect);
             customBackground.setBounds(tempRect);
-            customBackground.setState(getDrawableState());
+//            customBackground.setState(getDrawableState());
             customBackground.draw(canvas);
         }
 //        logd("DayView.onDraw", getDate() + ", " + isChecked());

@@ -16,8 +16,8 @@ public interface DayViewDecorator {
     /**
      * Set decoration options onto a facade to be applied to all relevant days
      *
-     * @param view View to decorate
+     * @param facade View to decorate
      */
-    void decorate(DayViewFacade view);
+    void decorate(DayViewFacade facade);
 
 }

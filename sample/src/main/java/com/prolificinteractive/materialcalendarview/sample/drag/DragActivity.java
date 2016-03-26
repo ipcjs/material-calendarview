@@ -3,8 +3,10 @@ package com.prolificinteractive.materialcalendarview.sample.drag;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -12,6 +14,8 @@ import com.github.ipcjs.explorer.compat.CompatContextInterface;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.CalendarPagerView;
 import com.prolificinteractive.materialcalendarview.DayView;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.sample.R;
@@ -41,6 +45,28 @@ public class DragActivity extends BaseActivity implements CompatContextInterface
         ArrayList<CalendarDay> dates = new ArrayList<>();
         dates.add(CalendarDay.from(new Date()));
         materialCalendarView.addDecorator(new EventDecorator(Color.RED, dates));
+        materialCalendarView.addDecorator(new DayViewDecorator() {
+
+            private Drawable drawable;
+
+            {
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.calendar_today_bg);
+//                drawable = new GradientDrawable();
+//                drawable.setUseLevel(false);
+//                drawable.setShape(GradientDrawable.RING);
+//                drawable.setColor(Color.RED);
+            }
+
+            @Override
+            public boolean shouldDecorate(CalendarDay day) {
+                return CalendarDay.today().equals(day);
+            }
+
+            @Override
+            public void decorate(DayViewFacade view) {
+                view.setBackgroundDrawable(drawable);
+            }
+        });
         materialCalendarView.setAutoSelectOnSingleMode(true);
         materialCalendarView.addDayViewDecorateListener(new DayView.DecorateListener() {
             @Override
